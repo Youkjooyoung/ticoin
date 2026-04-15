@@ -30,12 +30,7 @@ export default function Watchlist() {
     setLoading(true);
     watchlistApi.list()
       .then((d) => setItems(d || []))
-      .catch(() => {
-        setItems([
-          { id: 1, symbol: 'BTC', name: 'Bitcoin', type: 'CRYPTO', targetPrice: 75000, alertEnabled: true },
-          { id: 2, symbol: 'TSLA', name: 'Tesla', type: 'STOCK', targetPrice: 450, alertEnabled: false },
-        ]);
-      })
+      .catch(() => setItems([]))
       .finally(() => setLoading(false));
   }, []);
 
@@ -67,20 +62,19 @@ export default function Watchlist() {
       const updated = await watchlistApi.toggleAlert(item.id);
       setItems((l) => l.map((x) => (x.id === item.id ? updated : x)));
       toast.success(`${item.symbol} 알림을 ${updated.alertEnabled ? '켰습니다' : '껐습니다'}`);
-    } catch {
-      setItems((l) => l.map((x) => (x.id === item.id ? { ...x, alertEnabled: !x.alertEnabled } : x)));
-      toast.info('로컬에서만 변경되었습니다');
+    } catch (err) {
+      toast.error('변경 실패: ' + (err?.response?.data?.message ?? err.message));
     }
   };
 
   const remove = async (id, symbol) => {
     try {
       await watchlistApi.delete(id);
+      setItems((l) => l.filter((x) => x.id !== id));
       toast.success(`${symbol}을(를) 관심목록에서 삭제했습니다`);
-    } catch {
-      toast.info('로컬에서만 제거되었습니다');
+    } catch (err) {
+      toast.error('삭제 실패: ' + (err?.response?.data?.message ?? err.message));
     }
-    setItems((l) => l.filter((x) => x.id !== id));
   };
 
   const add = async () => {
@@ -98,11 +92,11 @@ export default function Watchlist() {
     };
     try {
       const created = await watchlistApi.create(payload);
-      setItems((l) => [...l, created]);
+      setItems((l) => [created, ...l]);
       toast.success(`${payload.symbol}을(를) 추가했습니다`);
-    } catch {
-      setItems((l) => [...l, { id: Date.now(), ...payload }]);
-      toast.info('로컬에만 저장되었습니다');
+    } catch (err) {
+      toast.error('추가 실패: ' + (err?.response?.data?.message ?? err.message));
+      return;
     }
     setForm({ symbol: '', targetPrice: '' });
     setFormOpen(false);

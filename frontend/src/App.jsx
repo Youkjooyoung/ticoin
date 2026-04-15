@@ -7,6 +7,7 @@ import Search from './pages/Search.jsx';
 import Trending from './pages/Trending.jsx';
 import Portfolio from './pages/Portfolio.jsx';
 import Watchlist from './pages/Watchlist.jsx';
+import Alerts from './pages/Alerts.jsx';
 import Profile from './pages/Profile.jsx';
 import NotFound from './pages/NotFound.jsx';
 
@@ -20,6 +21,7 @@ export default function App() {
           <Route path="/trending" element={<Trending />} />
           <Route path="/portfolio" element={<Portfolio />} />
           <Route path="/watchlist" element={<Watchlist />} />
+          <Route path="/alerts" element={<Alerts />} />
           <Route path="/profile" element={<Profile />} />
           <Route path="*" element={<NotFound />} />
         </Route>

@@ -22,13 +22,7 @@ export default function Portfolio() {
     setLoading(true);
     portfolioApi.list()
       .then((d) => setHoldings(d || []))
-      .catch(() => {
-        setHoldings([
-          { id: 1, symbol: 'BTC', name: 'Bitcoin', type: 'CRYPTO', quantity: 0.5, avgPrice: 58000 },
-          { id: 2, symbol: 'ETH', name: 'Ethereum', type: 'CRYPTO', quantity: 3.2, avgPrice: 2900 },
-          { id: 3, symbol: 'AAPL', name: 'Apple', type: 'STOCK', quantity: 10, avgPrice: 215 },
-        ]);
-      })
+      .catch(() => setHoldings([]))
       .finally(() => setLoading(false));
   }, []);
 
@@ -81,24 +75,23 @@ export default function Portfolio() {
     };
     try {
       const created = await portfolioApi.create(payload);
-      setHoldings((list) => [...list, created]);
+      setHoldings((list) => [created, ...list]);
       toast.success(`${payload.symbol}을(를) 추가했습니다`);
-    } catch {
-      setHoldings((list) => [...list, { id: Date.now(), ...payload }]);
-      toast.info('로컬에만 저장되었습니다 (백엔드 미기동)');
+      setForm({ symbol: '', quantity: '', avgPrice: '' });
+      setFormOpen(false);
+    } catch (err) {
+      toast.error('추가 실패: ' + (err?.response?.data?.message ?? err.message));
     }
-    setForm({ symbol: '', quantity: '', avgPrice: '' });
-    setFormOpen(false);
   };
 
   const removeHolding = async (id, symbol) => {
     try {
       await portfolioApi.delete(id);
+      setHoldings((list) => list.filter((h) => h.id !== id));
       toast.success(`${symbol}을(를) 삭제했습니다`);
-    } catch {
-      toast.info('로컬에서만 제거되었습니다');
+    } catch (err) {
+      toast.error('삭제 실패: ' + (err?.response?.data?.message ?? err.message));
     }
-    setHoldings((list) => list.filter((h) => h.id !== id));
   };
 
   const pnlColor = totalPnl >= 0 ? '#10B981' : '#EF4444';

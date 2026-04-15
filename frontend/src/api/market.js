@@ -27,3 +27,9 @@ export const watchlistApi = {
   toggleAlert: (id) => api.patch(`/watchlist/${id}/alert`).then((r) => r.data),
   delete: (id) => api.delete(`/watchlist/${id}`).then((r) => r.data),
 };
+
+export const alertApi = {
+  list: () => api.get('/alerts').then((r) => r.data),
+  create: (a) => api.post('/alerts', a).then((r) => r.data),
+  delete: (id) => api.delete(`/alerts/${id}`).then((r) => r.data),
+};

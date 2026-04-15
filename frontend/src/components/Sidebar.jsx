@@ -1,5 +1,5 @@
 import { NavLink } from 'react-router-dom';
-import { Home, Search, TrendingUp, Wallet, Star, User, Settings } from 'lucide-react';
+import { Home, Search, TrendingUp, Wallet, Star, Bell, User, Settings } from 'lucide-react';
 import { cn } from '../lib/utils.js';
 
 const NAV = [
@@ -8,6 +8,7 @@ const NAV = [
   { to: '/trending', label: '트렌딩', icon: TrendingUp },
   { to: '/portfolio', label: '포트폴리오', icon: Wallet },
   { to: '/watchlist', label: '관심목록', icon: Star },
+  { to: '/alerts', label: '가격 알림', icon: Bell },
   { to: '/profile', label: '프로필', icon: User },
 ];
 

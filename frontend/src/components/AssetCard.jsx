@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { Heart, MessageCircle, Share2, Bookmark } from 'lucide-react';
 import CandleChart from './charts/CandleChart.jsx';
 import { marketApi } from '../api/market.js';
+import { useMarketStore } from '../stores/marketStore.js';
 import { cn, fmtPrice, fmtPct, fmtCompact, changeClass } from '../lib/utils.js';
 
 const INTERVALS = ['15M', '1H', '4H', '1D', '1W'];
@@ -27,6 +28,7 @@ export default function AssetCard({ asset, onOpen }) {
   const [candles, setCandles] = useState([]);
   const [liked, setLiked] = useState(false);
   const [saved, setSaved] = useState(false);
+  const flash = useMarketStore((s) => s.flashes[asset.symbol]);
 
   const fallback = useMemo(() => generateMockCandles(asset.price || 100, 30), [asset.price]);
 
@@ -66,7 +68,13 @@ export default function AssetCard({ asset, onOpen }) {
           </div>
         </div>
         <div className="text-right">
-          <p className="text-lg font-extrabold mono flex items-center gap-1.5">
+          <p
+            className={cn(
+              'text-lg font-extrabold mono flex items-center gap-1.5 transition-colors duration-500',
+              flash === 'up' && 'text-up',
+              flash === 'down' && 'text-down'
+            )}
+          >
             ${fmtPrice(asset.price, asset.price < 10 ? 4 : 2)}
             <span className={cn('w-1.5 h-1.5 rounded-full', up ? 'bg-up' : 'bg-down', 'animate-pulse')} />
           </p>
