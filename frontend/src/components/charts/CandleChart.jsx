@@ -5,7 +5,6 @@ export default function CandleChart({ data = [], height = 240, showVolume = true
   const wrapRef = useRef(null);
   const [size, setSize] = useState({ w: 0, h: height });
 
-  // 부모 크기를 ResizeObserver로 추적 (초기 레이아웃 타이밍 이슈 해결)
   useEffect(() => {
     const el = wrapRef.current;
     if (!el) return;

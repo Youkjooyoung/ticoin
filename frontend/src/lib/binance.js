@@ -1,6 +1,3 @@
-/**
- * Binance 거래소 심볼 매핑 (ticoin symbol -> Binance USDT pair)
- */
 const STATIC_MAP = {
   BTC: 'BTCUSDT',
   ETH: 'ETHUSDT',

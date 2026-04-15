@@ -45,7 +45,6 @@ export default function Watchlist() {
 
   const priceMap = useMemo(() => Object.fromEntries(feed.map((a) => [a.symbol, a])), [feed]);
 
-  // localStorage 순서대로 정렬
   const sortedItems = useMemo(() => {
     const order = loadOrder();
     if (!order.length) return items;

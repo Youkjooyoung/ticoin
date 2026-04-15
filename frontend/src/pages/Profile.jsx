@@ -28,8 +28,7 @@ export default function Profile() {
   const [notifEnabled, setNotifEnabled] = useState(true);
   const fileRef = useRef(null);
 
-  // 모달 상태
-  const [modal, setModal] = useState(null); // 'account' | 'notifications' | 'help' | 'logout'
+  const [modal, setModal] = useState(null);
 
   useEffect(() => { load(); }, [load]);
 
@@ -129,7 +128,6 @@ export default function Profile() {
         </div>
       </section>
 
-      {/* 보유 요약 */}
       {feed.length > 0 && (
         <section className="glass-card p-4">
           <p className="text-[11px] text-text-3 mb-2">추적 중인 자산</p>
@@ -143,7 +141,6 @@ export default function Profile() {
         </section>
       )}
 
-      {/* 뉴스 */}
       <section>
         <h4 className="text-sm font-bold mb-3 flex items-center gap-1.5">
           <Newspaper className="w-4 h-4 text-brand-light" /> 최신 크립토 뉴스
@@ -180,7 +177,6 @@ export default function Profile() {
         {news.length === 0 && !newsError && <NewsSkeleton rows={3} />}
       </section>
 
-      {/* 설정 메뉴 */}
       <section className="glass-card divide-y divide-border">
         <button onClick={() => setModal('account')} className="w-full flex items-center gap-3 p-4 text-sm hover:bg-bg-soft transition-colors">
           <Settings className="w-4 h-4" />
@@ -213,7 +209,6 @@ export default function Profile() {
         </button>
       </section>
 
-      {/* 편집 모달 */}
       {editOpen && (
         <div
           className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-md animate-[fadeIn_0.2s_ease-out]"
@@ -300,7 +295,6 @@ export default function Profile() {
         </div>
       )}
 
-      {/* 설정 서브 모달 */}
       {modal && (
         <div
           className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-md animate-[fadeIn_0.2s_ease-out]"

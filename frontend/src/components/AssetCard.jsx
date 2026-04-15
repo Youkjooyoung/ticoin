@@ -31,7 +31,6 @@ export default function AssetCard({ asset, onOpen }) {
   const [commentOpen, setCommentOpen] = useState(false);
   const flash = useMarketStore((s) => s.flashes[asset.symbol]);
 
-  // Crypto: Binance 실제 klines, Stock: mock (backend Yahoo는 401로 동작 안 함)
   const { candles: binanceCandles, loading: klinesLoading } = useBinanceKlines(
     asset.type === 'CRYPTO' ? asset.symbol : null,
     interval

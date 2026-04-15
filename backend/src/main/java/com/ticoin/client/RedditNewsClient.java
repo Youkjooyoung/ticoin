@@ -10,11 +10,6 @@ import java.time.Instant;
 import java.util.List;
 import java.util.Map;
 
-/**
- * Fallback news source: Reddit r/CryptoCurrency top posts.
- * - Free, no auth key required (just User-Agent)
- * - JSON response from old.reddit.com (works reliably in server environments)
- */
 @Slf4j
 @Component
 public class RedditNewsClient {

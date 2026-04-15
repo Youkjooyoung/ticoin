@@ -13,10 +13,6 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
-/**
- * Allows controllers to declare a String parameter annotated with @DeviceId
- * to receive the current device identifier resolved by DeviceIdFilter.
- */
 @Component
 public class DeviceIdArgumentResolver implements HandlerMethodArgumentResolver {
 

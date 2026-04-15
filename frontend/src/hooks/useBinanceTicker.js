@@ -2,12 +2,6 @@ import { useEffect, useRef } from 'react';
 import { toBinanceSymbol, fromBinanceSymbol } from '../lib/binance.js';
 import { useMarketStore } from '../stores/marketStore.js';
 
-/**
- * Binance WebSocket combined stream으로 여러 심볼의 ticker를 실시간 구독.
- * 응답 주기: 초당 여러 번. 실제 거래소 수준의 반응성.
- *
- * @param {string[]} symbols - ['BTC', 'ETH', ...]
- */
 export function useBinanceTicker(symbols) {
   const updatePrice = useMarketStore((s) => s.updatePrice);
   const wsRef = useRef(null);
@@ -41,7 +35,7 @@ export function useBinanceTicker(symbols) {
     };
 
     ws.onerror = (err) => console.warn('[binance ticker] error', err);
-    ws.onclose = () => { /* natural close */ };
+    ws.onclose = () => {};
     wsRef.current = ws;
 
     return () => {

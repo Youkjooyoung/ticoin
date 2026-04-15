@@ -31,7 +31,6 @@ export default function Search() {
   );
   useBinanceTicker(cryptoSymbols);
 
-  // 자동완성 후보 — 즉시 (비 디바운스) 반영
   const suggestions = useMemo(() => {
     if (!q) return [];
     const ql = q.toLowerCase();
@@ -85,7 +84,6 @@ export default function Search() {
           <Loader2 className="absolute right-4 top-1/2 -translate-y-1/2 w-4 h-4 text-brand-light animate-spin" />
         )}
 
-        {/* 자동완성 드롭다운 */}
         {focused && q && suggestions.length > 0 && (
           <div className="absolute top-14 left-0 right-0 glass-card shadow-2xl z-20 max-h-[320px] overflow-y-auto">
             {suggestions.map((a) => (

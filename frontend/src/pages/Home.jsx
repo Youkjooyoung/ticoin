@@ -11,10 +11,8 @@ export default function Home() {
   const { feed, loading, loadFeed } = useMarketStore();
   const [selected, setSelected] = useState(null);
 
-  // 백엔드 WebSocket: 알림 이벤트 구독
   useLivePrices();
 
-  // Binance WebSocket: 코인 실시간 tick (sub-second)
   const cryptoSymbols = useMemo(
     () => feed.filter((a) => a.type === 'CRYPTO').map((a) => a.symbol),
     [feed]

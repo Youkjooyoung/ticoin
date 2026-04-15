@@ -53,10 +53,6 @@ public class PriceAlertService {
         }
     }
 
-    /**
-     * 20초 주기로 활성 알림을 검사해 목표가 도달 시 WebSocket으로 푸시.
-     * Low-cost: 한 번 조회로 현재 가격 맵을 만들고 일괄 검사.
-     */
     @Scheduled(fixedDelayString = "${ticoin.alert.check-interval-ms:20000}", initialDelay = 10000)
     public void checkAlerts() {
         List<PriceAlert> active = alertRepository.findByTriggeredFalse();

@@ -11,10 +11,6 @@ import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
 
-/**
- * Extracts X-Device-Id from request headers, stores it as a request attribute
- * and MDC key "deviceId" for logging. Anonymous requests get "anonymous".
- */
 @Order(1)
 @Component
 public class DeviceIdFilter extends OncePerRequestFilter {

@@ -2,10 +2,6 @@ import { ChevronDown } from 'lucide-react';
 import { useMarketStore } from '../stores/marketStore.js';
 import { cn, fmtPrice } from '../lib/utils.js';
 
-/**
- * 심볼 선택 드롭다운 — marketStore.feed에서 자산 목록을 불러와 <select>로 렌더.
- * 사용자가 직접 입력하지 않고 목록에서 고름.
- */
 export default function SymbolSelect({ value, onChange, className, placeholder = '심볼을 선택하세요' }) {
   const feed = useMarketStore((s) => s.feed);
 

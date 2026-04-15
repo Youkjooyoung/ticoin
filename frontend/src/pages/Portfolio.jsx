@@ -51,7 +51,6 @@ export default function Portfolio() {
   const totalPnl = totalValue - totalCost;
   const totalPnlPct = totalCost ? (totalPnl / totalCost) * 100 : 0;
 
-  // 7일 수익률 추이 (mock — 실제 서비스는 과거 가격 API가 필요)
   const pnlHistory = useMemo(() => {
     const days = 7;
     const base = totalCost || 10000;
