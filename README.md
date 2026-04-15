@@ -137,13 +137,53 @@ Vite dev 서버는 `/api`와 `/ws`를 `http://localhost:8090`으로 자동 프�
 
 | Path | 설명 |
 | --- | --- |
-| `/` | 피드 + StoryBar + **AssetDetailModal (클릭 시 열림)** + Skeleton 로더 + 실시간 WebSocket 구독 |
+| `/` | 피드 + StoryBar + **AssetDetailModal** + **가격 flash 펄스** (WS) |
 | `/search` | **300ms 디바운스** 검색 + 트렌딩/최근 검색 탭 |
 | `/trending` | 최고 상승 / 실시간 랭킹 / 하락 종목 |
-| `/portfolio` | 총자산 + **7일 수익률 LineChart** + 자산배분 도넛 + CRUD + Toast |
-| `/watchlist` | 관심자산 + 목표가 + 알림 토글 + **↑↓ 정렬 (localStorage 저장)** + Toast |
-| `/profile` | 프로필 + 크립토 뉴스 (NewsSkeleton) + 설정 |
+| `/portfolio` | 총자산 + **7일 수익률 LineChart** + 자산배분 도넛 + 실제 DB CRUD + Toast |
+| `/watchlist` | 관심자산 + 목표가 + 알림 토글 + ↑↓ 정렬 + 실제 DB CRUD |
+| `/alerts` | **가격 알림 CRUD** + 발동된 알림 실시간 WS 푸시 |
+| `/profile` | 프로필 + 크립토 뉴스 (Reddit 폴백) + 설정 |
 | `*` | 404 NotFound 페이지 |
+
+## v0.3.0 — 풀스택 구현 + AWS 운영 준비 (2026-04-15)
+
+기존 스켈레톤을 진짜 동작하는 앱으로 만들고 AWS 운영 배포 준비까지 완료.
+
+### Backend 강화
+- **Device Identity** — `X-Device-Id` 헤더 필터 + `@DeviceId` argument resolver. 로그인 없이도 기기별 데이터 영속화
+- **Price Alerts** — `price_alert` 테이블 + CRUD + `@Scheduled` 체커가 20초 주기로 목표가 검사, 도달 시 `/topic/alerts/{deviceId}` WebSocket 푸시
+- **Flyway V2 마이그레이션** — `device_id` 컬럼 + alerts 테이블 + 유니크 제약 재설정 (device + symbol)
+- **Portfolio/Watchlist 재작성** — 파생 쿼리(`findByDeviceIdOrderByCreatedAtDesc`)로 low-code, 전부 device_id 스코프
+- **Multi-profile** — `application-local.yml` / `application-prod.yml` + 환경변수 외재화 (`SPRING_PROFILES_ACTIVE`, `DB_*`, `TICOIN_CORS_ORIGINS`, …)
+- **logback-spring.xml** — local은 컬러 콘솔 + MDC deviceId, prod는 CloudWatch-friendly 한 줄 포맷
+- **Build Info** — `springBoot.buildInfo` → `/actuator/info`에 버전·빌드 시각 노출
+- **Graceful shutdown** + `management.endpoint.health.probes.enabled`로 liveness/readiness 분리
+- **News fallback** — CryptoCompare 유료화 대응, Reddit r/CryptoCurrency 자동 폴백
+
+### Frontend 실구현
+- **Device ID util** — `lib/device.js`가 localStorage에 UUID 생성·캐시
+- **Axios interceptor** — 모든 API 요청에 `X-Device-Id` 자동 주입
+- **alertStore (Zustand)** — 알림 CRUD + 발동된 알림 히스토리 (최근 5개)
+- **useLivePrices 확장** — `/topic/prices` 구독 + `/topic/alerts/{deviceId}` 구독 (발동 시 Toast)
+- **가격 flash 펄스** — `mergeFeed`가 이전 가격과 비교해 변동 방향을 `flashes` 맵에 저장, `AssetCard`에서 900ms 동안 상승/하락 색상 강조
+- **Alerts 페이지** (`/alerts`) — 목표가 ABOVE/BELOW 등록, 최근 발동 이력, 삭제
+- **Mock 폴백 제거** — Portfolio/Watchlist가 이제 실제 DB만 사용, 에러 시 Toast로 알림
+- **백엔드 연동 API 추가** — `alertApi` 래퍼
+
+### AWS 운영 배포 준비
+- **`docker-compose.prod.yml`** — 이미지 태그 주입 가능, 메모리 리밋, readiness probe, JVM 컨테이너 옵션
+- **Nginx runtime env** — `nginx.conf.template` + `docker-entrypoint.sh` + `envsubst`로 `BACKEND_URL` 런타임 주입 (이미지 재빌드 없이 환경 전환)
+- **프런트 `/healthz`** — ALB 타겟 헬스체크용
+- **`.env.prod.example`** — 안전한 기본값
+- **`deploy/aws-deploy.md`** — EC2 / ECS Fargate / App Runner 3가지 경로별 단계별 가이드
+- **JVM 튜닝** — `-XX:MaxRAMPercentage=75.0` 컨테이너 친화 옵션
+- **Prometheus endpoint** (prod 프로파일 전용) — 추후 CloudWatch Container Insights 연동 가능
+
+### 주요 추가 파일
+Backend: `DeviceIdFilter`, `DeviceIdArgumentResolver`, `PriceAlert`, `PriceAlertRepository`, `PriceAlertService`, `PriceAlertController`, `AlertCreateRequest`, `V2__device_identity_and_alerts.sql`, `application-local.yml`, `application-prod.yml`, `logback-spring.xml`, `RedditNewsClient`
+Frontend: `lib/device.js`, `stores/alertStore.js`, `pages/Alerts.jsx`
+Infra: `nginx.conf.template`, `docker-entrypoint.sh`, `docker-compose.prod.yml`, `.env.prod.example`, `deploy/aws-deploy.md`
 
 ## 고도화 버전 (v0.2.0)
 
