@@ -1,0 +1,32 @@
+spring:
+  datasource:
+    url: jdbc:h2:mem:ticoin-test;MODE=PostgreSQL;DB_CLOSE_DELAY=-1
+    driver-class-name: org.h2.Driver
+    username: sa
+    password:
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.H2Dialect
+  flyway:
+    enabled: false
+  cache:
+    type: simple
+
+ticoin:
+  cors:
+    allowed-origins: http://localhost:5174
+  websocket:
+    broadcast-interval-ms: 60000
+  api:
+    coingecko:
+      base-url: http://localhost:1
+    yahoo:
+      base-url: http://localhost:1
+    cryptocompare:
+      base-url: http://localhost:1
+    coinmarketcap:
+      base-url: http://localhost:1
+      api-key: ""
