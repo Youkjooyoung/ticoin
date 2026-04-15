@@ -146,6 +146,59 @@ Vite dev 서버는 `/api`와 `/ws`를 `http://localhost:8090`으로 자동 프�
 | `/profile` | 프로필 + 크립토 뉴스 (Reddit 폴백) + 설정 |
 | `*` | 404 NotFound 페이지 |
 
+## v0.4.0 — UX 대수정 + 실시간 거래소급 반영 (2026-04-15)
+
+사용자 피드백 13개 항목 전부 반영. 실시간성과 입력 편의성을 중심으로 대규모 수정.
+
+### 핵심 개선
+- **Binance WebSocket 직결** — 프론트엔드가 `wss://stream.binance.com:9443/stream`에 직접 구독. 초당 수 회 tick 업데이트로 실제 거래소 수준의 반응성 (실측: BTC 1.5초 간격으로 센트 단위 변화)
+- **Binance REST klines** — 차트 인터벌 버튼(15M/1H/4H/1D/1W) 전부 실제 데이터 로드. CoinGecko의 고정 granularity 한계 우회
+- **가격 flash 펄스** — 가격 변동 시 600ms 동안 상승/하락 색상 강조 (`marketStore.flashes` 맵)
+
+### 신규 컴포넌트
+- **`SymbolSelect`** — `marketStore.feed`에서 옵션 로드, 각 옵션에 현재가 표시. Portfolio/Watchlist/Alerts 모든 심볼 입력 교체
+- **`PriceInput`** — 참조가격에 따라 `step` 자동 계산. 1000만↑→1만, 100→1, 0.01→0.0001. `min="0"` 음수 차단
+- **`CommentPanel`** — AssetCard 댓글 토글, 백엔드 CRUD 연동, 본인 댓글만 삭제
+- **`NotificationDropdown`** — 헤더 🔔 버튼, `alertStore.triggered` 실시간 목록
+- **`QuickCreateDropdown`** — 헤더 `+` 버튼, 포트폴리오/관심목록/알림/검색 빠른 이동
+
+### 백엔드 (Flyway V3)
+- **Comments** — `comment` 테이블, 심볼별/기기별 CRUD, 500자 제한
+- **Profile** — `profile` 테이블, 기기별 닉네임/자기소개/아바타 URL, `getOrCreate` 패턴
+
+### 페이지 개선
+- **Search** — 입력 즉시 상위 8개 자동완성 드롭다운
+- **Trending** — 최고상승/실시간랭킹/하락종목 전부 클릭 가능, AssetDetailModal 열림
+- **Profile** — 편집 모달 (닉네임/자기소개/아바타 FileReader→base64), 설정 메뉴 4개 전부 활성화 (계정/알림 토글/다크모드 토글/도움말/로그아웃)
+- **Sidebar** — ticoin 로고가 `<NavLink to="/">` (홈으로)
+- **Header** — 페이지별 타이틀 매핑, `+`/🔔 드롭다운 outside-click 닫기
+
+### 가격 step 유틸 (`lib/price.js`)
+| 참조가격 | step |
+|---|---|
+| ≥ 10,000,000 | 10,000 |
+| ≥ 1,000,000 | 1,000 |
+| ≥ 100,000 | 100 |
+| ≥ 10,000 | 10 |
+| ≥ 1,000 | 10 |
+| ≥ 100 | 1 |
+| ≥ 10 | 0.1 |
+| ≥ 1 | 0.01 |
+| ≥ 0.1 | 0.001 |
+| ≥ 0.01 | 0.0001 |
+| ≥ 0.001 | 0.00001 |
+
+### 버그 수정
+- **CandleChart canvas width=0** — 최초 `useEffect`에서 `getBoundingClientRect()`가 0을 반환하는 타이밍 이슈. `ResizeObserver`로 부모 크기 추적하도록 전면 재작성
+- **Docker frontend CRLF** — `docker-entrypoint.sh`가 Windows CRLF로 커밋되어 Linux 컨테이너에서 `exec: no such file or directory` 실패. Dockerfile에 `sed -i 's/\r$//'` 추가
+
+### 추가 문서
+- `docs/CHANGELOG.md` — 전체 버전별 변경사항
+- `docs/DEVELOPMENT-LOG.md` — 세션별 개발 일지
+- `docs/ARCHITECTURE.md` — 시스템 구조 / 데이터 흐름 / 의사결정 기록
+
+---
+
 ## v0.3.0 — 풀스택 구현 + AWS 운영 준비 (2026-04-15)
 
 기존 스켈레톤을 진짜 동작하는 앱으로 만들고 AWS 운영 배포 준비까지 완료.
