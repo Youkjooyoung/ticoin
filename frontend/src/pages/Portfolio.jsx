@@ -1,10 +1,13 @@
 import { useEffect, useMemo, useState } from 'react';
 import { Plus, Trash2, LineChart as LineIcon } from 'lucide-react';
 import { useMarketStore } from '../stores/marketStore.js';
+import { useBinanceTicker } from '../hooks/useBinanceTicker.js';
 import { portfolioApi } from '../api/market.js';
 import { useToastStore } from '../stores/toastStore.js';
 import LineChart from '../components/charts/LineChart.jsx';
 import ListSkeleton from '../components/skeletons/ListSkeleton.jsx';
+import SymbolSelect from '../components/SymbolSelect.jsx';
+import PriceInput from '../components/PriceInput.jsx';
 import { cn, fmtPrice, fmtPct, changeClass } from '../lib/utils.js';
 
 const DONUT_COLORS = ['#8B5CF6', '#10B981', '#F59E0B', '#3B82F6', '#EF4444', '#EC4899', '#06B6D4'];
@@ -18,6 +21,12 @@ export default function Portfolio() {
   const toast = useToastStore();
 
   useEffect(() => { loadFeed(); }, [loadFeed]);
+
+  const cryptoSymbols = useMemo(
+    () => feed.filter((a) => a.type === 'CRYPTO').map((a) => a.symbol),
+    [feed]
+  );
+  useBinanceTicker(cryptoSymbols);
   useEffect(() => {
     setLoading(true);
     portfolioApi.list()
@@ -144,31 +153,32 @@ export default function Portfolio() {
           </button>
         </div>
 
-        {formOpen && (
-          <div className="glass-card p-4 mb-3 grid grid-cols-3 gap-2">
-            <input
-              placeholder="심볼 (BTC)"
-              value={form.symbol}
-              onChange={(e) => setForm({ ...form, symbol: e.target.value })}
-              className="h-9 px-3 rounded-md bg-bg-soft border border-border text-xs outline-none focus:border-brand"
-            />
-            <input
-              placeholder="수량"
-              type="number"
-              value={form.quantity}
-              onChange={(e) => setForm({ ...form, quantity: e.target.value })}
-              className="h-9 px-3 rounded-md bg-bg-soft border border-border text-xs outline-none focus:border-brand"
-            />
-            <input
-              placeholder="평단가"
-              type="number"
-              value={form.avgPrice}
-              onChange={(e) => setForm({ ...form, avgPrice: e.target.value })}
-              className="h-9 px-3 rounded-md bg-bg-soft border border-border text-xs outline-none focus:border-brand"
-            />
-            <button onClick={addHolding} className="col-span-3 h-9 rounded-md bg-brand text-white text-xs font-semibold hover:bg-brand-dark transition-colors">저장</button>
-          </div>
-        )}
+        {formOpen && (() => {
+          const selected = priceMap[form.symbol];
+          const refPrice = selected?.price;
+          return (
+            <div className="glass-card p-4 mb-3 grid grid-cols-3 gap-2">
+              <SymbolSelect
+                value={form.symbol}
+                onChange={(v) => setForm({ ...form, symbol: v, avgPrice: priceMap[v]?.price ? String(priceMap[v].price) : form.avgPrice })}
+                placeholder="심볼 선택"
+              />
+              <PriceInput
+                value={form.quantity}
+                onChange={(v) => setForm({ ...form, quantity: v })}
+                referencePrice={1}
+                placeholder="수량"
+              />
+              <PriceInput
+                value={form.avgPrice}
+                onChange={(v) => setForm({ ...form, avgPrice: v })}
+                referencePrice={refPrice ?? 100}
+                placeholder="평단가"
+              />
+              <button onClick={addHolding} className="col-span-3 h-9 rounded-md bg-brand text-white text-xs font-semibold hover:bg-brand-dark transition-colors">저장</button>
+            </div>
+          );
+        })()}
 
         {loading ? (
           <ListSkeleton rows={3} />

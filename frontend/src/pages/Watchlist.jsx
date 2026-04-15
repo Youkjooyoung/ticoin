@@ -1,10 +1,13 @@
 import { useEffect, useMemo, useState } from 'react';
 import { Bell, BellOff, Trash2, Plus, ChevronUp, ChevronDown } from 'lucide-react';
 import { useMarketStore } from '../stores/marketStore.js';
+import { useBinanceTicker } from '../hooks/useBinanceTicker.js';
 import { watchlistApi } from '../api/market.js';
 import { useToastStore } from '../stores/toastStore.js';
 import ListSkeleton from '../components/skeletons/ListSkeleton.jsx';
 import MiniChart from '../components/charts/MiniChart.jsx';
+import SymbolSelect from '../components/SymbolSelect.jsx';
+import PriceInput from '../components/PriceInput.jsx';
 import { cn, fmtPrice, fmtPct, changeClass } from '../lib/utils.js';
 
 const ORDER_KEY = 'ticoin-watchlist-order';
@@ -24,6 +27,12 @@ export default function Watchlist() {
   const [formOpen, setFormOpen] = useState(false);
   const [form, setForm] = useState({ symbol: '', targetPrice: '' });
   const toast = useToastStore();
+
+  const cryptoSymbols = useMemo(
+    () => feed.filter((a) => a.type === 'CRYPTO').map((a) => a.symbol),
+    [feed]
+  );
+  useBinanceTicker(cryptoSymbols);
 
   useEffect(() => { loadFeed(); }, [loadFeed]);
   useEffect(() => {
@@ -114,24 +123,26 @@ export default function Watchlist() {
         </button>
       </div>
 
-      {formOpen && (
-        <div className="glass-card p-4 grid grid-cols-2 gap-2">
-          <input
-            placeholder="심볼"
-            value={form.symbol}
-            onChange={(e) => setForm({ ...form, symbol: e.target.value })}
-            className="h-9 px-3 rounded-md bg-bg-soft border border-border text-xs outline-none focus:border-brand"
-          />
-          <input
-            placeholder="목표가 (선택)"
-            type="number"
-            value={form.targetPrice}
-            onChange={(e) => setForm({ ...form, targetPrice: e.target.value })}
-            className="h-9 px-3 rounded-md bg-bg-soft border border-border text-xs outline-none focus:border-brand"
-          />
-          <button onClick={add} className="col-span-2 h-9 rounded-md bg-brand text-white text-xs font-semibold hover:bg-brand-dark transition-colors">저장</button>
-        </div>
-      )}
+      {formOpen && (() => {
+        const selected = priceMap[form.symbol];
+        const refPrice = selected?.price ?? 100;
+        return (
+          <div className="glass-card p-4 grid grid-cols-2 gap-2">
+            <SymbolSelect
+              value={form.symbol}
+              onChange={(v) => setForm({ ...form, symbol: v })}
+              placeholder="심볼 선택"
+            />
+            <PriceInput
+              value={form.targetPrice}
+              onChange={(v) => setForm({ ...form, targetPrice: v })}
+              referencePrice={refPrice}
+              placeholder="목표가 (선택)"
+            />
+            <button onClick={add} className="col-span-2 h-9 rounded-md bg-brand text-white text-xs font-semibold hover:bg-brand-dark transition-colors">저장</button>
+          </div>
+        );
+      })()}
 
       {loading ? (
         <ListSkeleton rows={3} />

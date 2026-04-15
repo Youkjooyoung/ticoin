@@ -1,9 +1,12 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { Bell, Plus, Trash2, TrendingUp, TrendingDown, CheckCircle2 } from 'lucide-react';
 import { useAlertStore } from '../stores/alertStore.js';
 import { useMarketStore } from '../stores/marketStore.js';
+import { useBinanceTicker } from '../hooks/useBinanceTicker.js';
 import { useToastStore } from '../stores/toastStore.js';
 import ListSkeleton from '../components/skeletons/ListSkeleton.jsx';
+import SymbolSelect from '../components/SymbolSelect.jsx';
+import PriceInput from '../components/PriceInput.jsx';
 import { cn, fmtPrice } from '../lib/utils.js';
 
 export default function Alerts() {
@@ -17,6 +20,12 @@ export default function Alerts() {
   useEffect(() => { load(); loadFeed(); }, [load, loadFeed]);
 
   const priceMap = Object.fromEntries(feed.map((a) => [a.symbol, a]));
+
+  const cryptoSymbols = useMemo(
+    () => feed.filter((a) => a.type === 'CRYPTO').map((a) => a.symbol),
+    [feed]
+  );
+  useBinanceTicker(cryptoSymbols);
 
   const submit = async () => {
     if (!form.symbol || !form.target) {
@@ -81,26 +90,27 @@ export default function Alerts() {
 
       {formOpen && (
         <div className="glass-card p-4 grid grid-cols-3 gap-2">
-          <input
-            placeholder="심볼 (BTC)"
+          <SymbolSelect
             value={form.symbol}
-            onChange={(e) => setForm({ ...form, symbol: e.target.value })}
-            className="h-9 px-3 rounded-md bg-bg-soft border border-border text-xs outline-none focus:border-brand"
+            onChange={(v) => {
+              const asset = priceMap[v];
+              setForm({ ...form, symbol: v, target: asset?.price ? String(asset.price) : form.target });
+            }}
+            placeholder="심볼 선택"
           />
           <select
             value={form.condition}
             onChange={(e) => setForm({ ...form, condition: e.target.value })}
-            className="h-9 px-3 rounded-md bg-bg-soft border border-border text-xs outline-none focus:border-brand"
+            className="h-9 px-3 rounded-md bg-bg-soft border border-border text-xs outline-none focus:border-brand cursor-pointer"
           >
             <option value="ABOVE">이상 (상승 돌파)</option>
             <option value="BELOW">이하 (하락 돌파)</option>
           </select>
-          <input
-            placeholder="목표가"
-            type="number"
+          <PriceInput
             value={form.target}
-            onChange={(e) => setForm({ ...form, target: e.target.value })}
-            className="h-9 px-3 rounded-md bg-bg-soft border border-border text-xs outline-none focus:border-brand"
+            onChange={(v) => setForm({ ...form, target: v })}
+            referencePrice={priceMap[form.symbol]?.price ?? 100}
+            placeholder="목표가"
           />
           <button
             onClick={submit}

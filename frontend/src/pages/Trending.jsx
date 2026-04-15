@@ -1,12 +1,21 @@
-import { useEffect, useMemo } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { TrendingUp, TrendingDown, Flame } from 'lucide-react';
 import { useMarketStore } from '../stores/marketStore.js';
+import { useBinanceTicker } from '../hooks/useBinanceTicker.js';
 import { cn, fmtPrice, fmtPct, changeClass, fmtCompact } from '../lib/utils.js';
 import MiniChart from '../components/charts/MiniChart.jsx';
+import AssetDetailModal from '../components/AssetDetailModal.jsx';
 
 export default function Trending() {
   const { feed, loadFeed } = useMarketStore();
+  const [selected, setSelected] = useState(null);
   useEffect(() => { loadFeed(); }, [loadFeed]);
+
+  const cryptoSymbols = useMemo(
+    () => feed.filter((a) => a.type === 'CRYPTO').map((a) => a.symbol),
+    [feed]
+  );
+  useBinanceTicker(cryptoSymbols);
 
   const sorted = useMemo(
     () => [...feed].sort((a, b) => (b.changePercent24h ?? 0) - (a.changePercent24h ?? 0)),
@@ -23,7 +32,12 @@ export default function Trending() {
         </h3>
         <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
           {top.map((a, i) => (
-            <div key={a.symbol} className="glass-card p-4 relative overflow-hidden">
+            <button
+              type="button"
+              onClick={() => setSelected(a)}
+              key={a.symbol}
+              className="glass-card p-4 relative overflow-hidden text-left hover:border-brand/50 transition-colors"
+            >
               <span className="absolute top-3 right-3 text-[10px] font-extrabold text-brand-light bg-brand-soft px-2 py-0.5 rounded-full">#{i + 1}</span>
               <div className="flex items-center gap-3 mb-3">
                 <div className="w-10 h-10 rounded-full bg-gradient-to-br from-up to-up/70 flex items-center justify-center font-extrabold text-xs">
@@ -42,7 +56,7 @@ export default function Trending() {
                   {fmtPct(a.changePercent24h)}
                 </p>
               </div>
-            </div>
+            </button>
           ))}
         </div>
       </section>
@@ -51,7 +65,12 @@ export default function Trending() {
         <h3 className="text-sm font-bold mb-3">실시간 랭킹</h3>
         <div className="glass-card divide-y divide-border">
           {sorted.map((a, i) => (
-            <div key={a.symbol} className="flex items-center gap-3 p-3.5">
+            <button
+              type="button"
+              onClick={() => setSelected(a)}
+              key={a.symbol}
+              className="w-full flex items-center gap-3 p-3.5 text-left hover:bg-bg-soft transition-colors"
+            >
               <span className="w-6 text-center text-xs text-text-3 mono font-bold">{i + 1}</span>
               <div className="w-9 h-9 rounded-full bg-gradient-to-br from-brand to-brand-dark flex items-center justify-center font-extrabold text-[10px]">
                 {a.symbol?.slice(0, 3)}
@@ -67,7 +86,7 @@ export default function Trending() {
                   {fmtPct(a.changePercent24h)}
                 </p>
               </div>
-            </div>
+            </button>
           ))}
         </div>
       </section>
@@ -79,7 +98,12 @@ export default function Trending() {
           </h3>
           <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
             {worst.map((a) => (
-              <div key={a.symbol} className="glass-card p-4">
+              <button
+                type="button"
+                onClick={() => setSelected(a)}
+                key={a.symbol}
+                className="glass-card p-4 text-left hover:border-down/50 transition-colors"
+              >
                 <div className="flex items-center gap-3 mb-2">
                   <div className="w-9 h-9 rounded-full bg-down/20 border border-down/40 flex items-center justify-center font-extrabold text-[10px] text-down">
                     {a.symbol?.slice(0, 3)}
@@ -91,11 +115,13 @@ export default function Trending() {
                     </p>
                   </div>
                 </div>
-              </div>
+              </button>
             ))}
           </div>
         </section>
       )}
+
+      {selected && <AssetDetailModal asset={selected} onClose={() => setSelected(null)} />}
     </div>
   );
 }
