@@ -1,0 +1,75 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: ticoin-postgres
+    restart: always
+    environment:
+      POSTGRES_DB: ${DB_NAME}
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+    volumes:
+      - ticoin-pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER} -d ${DB_NAME}"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    deploy:
+      resources:
+        limits:
+          memory: 512m
+
+  backend:
+    image: ${BACKEND_IMAGE:-ticoin-backend:latest}
+    container_name: ticoin-backend
+    restart: always
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      SPRING_PROFILES_ACTIVE: prod
+      SERVER_PORT: 8090
+      DB_HOST: postgres
+      DB_PORT: 5432
+      DB_NAME: ${DB_NAME}
+      DB_USER: ${DB_USER}
+      DB_PASSWORD: ${DB_PASSWORD}
+      DB_POOL_SIZE: ${DB_POOL_SIZE:-20}
+      TICOIN_CORS_ORIGINS: ${CORS_ORIGINS}
+      TICOIN_WS_INTERVAL_MS: ${WS_INTERVAL_MS:-15000}
+      TICOIN_ALERT_INTERVAL_MS: ${ALERT_INTERVAL_MS:-20000}
+      LOG_LEVEL_APP: ${LOG_LEVEL:-INFO}
+      CMC_API_KEY: ${CMC_API_KEY:-}
+      JAVA_TOOL_OPTIONS: "-XX:+UseContainerSupport -XX:MaxRAMPercentage=75.0 -Djava.security.egd=file:/dev/./urandom"
+    expose:
+      - "8090"
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://localhost:8090/actuator/health/readiness | grep -q UP || exit 1"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+      start_period: 60s
+    deploy:
+      resources:
+        limits:
+          memory: 1g
+
+  frontend:
+    image: ${FRONTEND_IMAGE:-ticoin-frontend:latest}
+    container_name: ticoin-frontend
+    restart: always
+    depends_on:
+      backend:
+        condition: service_healthy
+    environment:
+      BACKEND_URL: http://backend:8090
+    ports:
+      - "${FRONTEND_PORT:-80}:80"
+    deploy:
+      resources:
+        limits:
+          memory: 128m
+
+volumes:
+  ticoin-pgdata:
+    driver: local
