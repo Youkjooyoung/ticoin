@@ -7,6 +7,7 @@ const TITLES = {
   '/trending': '트렌딩',
   '/portfolio': '포트폴리오',
   '/watchlist': '관심목록',
+  '/alerts': '가격 알림',
   '/profile': '프로필',
 };
 
