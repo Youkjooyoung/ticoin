@@ -45,6 +45,27 @@ export const useMarketStore = create((set, get) => ({
       set({ trending: FALLBACK_FEED.slice(0, 5) });
     }
   },
+
+  // 실시간 가격 업데이트 (WebSocket에서 호출)
+  updatePrice: (symbol, newPrice) => {
+    const feed = get().feed.map((a) => {
+      if (a.symbol !== symbol) return a;
+      const prev = a.price;
+      const change24h = newPrice - (prev - (a.change24h ?? 0));
+      const base = prev - (a.change24h ?? 0) || 1;
+      const changePercent24h = ((newPrice - base) / base) * 100;
+      return { ...a, price: newPrice, change24h, changePercent24h };
+    });
+    set({ feed });
+  },
+
+  // 서버에서 받은 전체 피드로 병합 (WebSocket broadcast)
+  mergeFeed: (incoming) => {
+    if (!Array.isArray(incoming) || incoming.length === 0) return;
+    const map = new Map(get().feed.map((a) => [a.symbol, a]));
+    incoming.forEach((a) => map.set(a.symbol, { ...map.get(a.symbol), ...a }));
+    set({ feed: Array.from(map.values()) });
+  },
 }));
 
 const FALLBACK_FEED = [
