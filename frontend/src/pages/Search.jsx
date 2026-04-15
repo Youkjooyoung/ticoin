@@ -1,7 +1,9 @@
-import { useEffect, useState } from 'react';
-import { Search as SearchIcon, Clock, TrendingUp as TrendIcon } from 'lucide-react';
+import { useEffect, useMemo, useState } from 'react';
+import { Search as SearchIcon, Clock, TrendingUp as TrendIcon, Loader2 } from 'lucide-react';
 import { useMarketStore } from '../stores/marketStore.js';
+import { useDebounce } from '../hooks/useDebounce.js';
 import MiniChart from '../components/charts/MiniChart.jsx';
+import AssetDetailModal from '../components/AssetDetailModal.jsx';
 import { cn, fmtPrice, fmtPct, changeClass } from '../lib/utils.js';
 
 const TABS = [
@@ -14,18 +16,26 @@ export default function Search() {
   const [q, setQ] = useState('');
   const [tab, setTab] = useState('trending');
   const [recent, setRecent] = useState([]);
+  const [selected, setSelected] = useState(null);
+
+  const debouncedQ = useDebounce(q, 300);
+  const isTyping = q !== debouncedQ;
 
   useEffect(() => { loadFeed(); }, [loadFeed]);
 
-  const filtered = q
-    ? feed.filter((a) =>
-        a.name.toLowerCase().includes(q.toLowerCase()) ||
-        a.symbol.toLowerCase().includes(q.toLowerCase())
-      )
-    : (tab === 'trending' ? feed : recent);
+  const filtered = useMemo(() => {
+    if (debouncedQ) {
+      const q = debouncedQ.toLowerCase();
+      return feed.filter((a) =>
+        a.name.toLowerCase().includes(q) || a.symbol.toLowerCase().includes(q)
+      );
+    }
+    return tab === 'trending' ? feed : recent;
+  }, [debouncedQ, tab, feed, recent]);
 
   const onPick = (a) => {
     setRecent((r) => [a, ...r.filter((x) => x.symbol !== a.symbol)].slice(0, 8));
+    setSelected(a);
   };
 
   return (
@@ -36,11 +46,14 @@ export default function Search() {
           value={q}
           onChange={(e) => setQ(e.target.value)}
           placeholder="종목 또는 코인 검색"
-          className="w-full h-12 pl-11 pr-4 rounded-xl bg-bg-elev border border-border text-sm outline-none focus:border-brand"
+          className="w-full h-12 pl-11 pr-11 rounded-xl bg-bg-elev border border-border text-sm outline-none focus:border-brand"
         />
+        {isTyping && (
+          <Loader2 className="absolute right-4 top-1/2 -translate-y-1/2 w-4 h-4 text-brand-light animate-spin" />
+        )}
       </div>
 
-      {!q && (
+      {!debouncedQ && (
         <div className="flex gap-2">
           {TABS.map(({ key, label, icon: Icon }) => (
             <button
@@ -85,6 +98,8 @@ export default function Search() {
           </button>
         ))}
       </div>
+
+      {selected && <AssetDetailModal asset={selected} onClose={() => setSelected(null)} />}
     </div>
   );
 }

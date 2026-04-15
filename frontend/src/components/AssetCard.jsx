@@ -22,7 +22,7 @@ function generateMockCandles(seed = 100, length = 30) {
   return out;
 }
 
-export default function AssetCard({ asset }) {
+export default function AssetCard({ asset, onOpen }) {
   const [interval, setInterval] = useState('1H');
   const [candles, setCandles] = useState([]);
   const [liked, setLiked] = useState(false);
@@ -55,7 +55,7 @@ export default function AssetCard({ asset }) {
 
   return (
     <article className="glass-card p-5 hover:border-border-strong transition-colors">
-      <header className="flex items-start justify-between mb-4">
+      <header className="flex items-start justify-between mb-4 cursor-pointer" onClick={() => onOpen?.(asset)}>
         <div className="flex items-center gap-3">
           <div className="w-11 h-11 rounded-full bg-gradient-to-br from-brand to-brand-dark flex items-center justify-center font-extrabold text-sm">
             {asset.symbol?.slice(0, 3)}

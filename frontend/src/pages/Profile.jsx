@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { User, Settings, Bell, Moon, HelpCircle, LogOut, ChevronRight, Newspaper, ExternalLink } from 'lucide-react';
 import { newsApi } from '../api/market.js';
+import NewsSkeleton from '../components/skeletons/NewsSkeleton.jsx';
 
 const STATS = [
   { label: '팔로워', value: '1.2K' },
@@ -79,10 +80,8 @@ export default function Profile() {
               </div>
             </a>
           ))}
-          {news.length === 0 && !newsError && (
-            <p className="text-center text-xs text-text-3 py-6">로딩 중...</p>
-          )}
         </div>
+        {news.length === 0 && !newsError && <NewsSkeleton rows={3} />}
       </section>
 
       <section className="glass-card divide-y divide-border">
