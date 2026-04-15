@@ -58,7 +58,6 @@ public class RedditNewsClient {
         String permalink = (String) d.get("permalink");
         String url = (String) d.get("url");
         String thumbnail = (String) d.get("thumbnail");
-        // self-posts have no preview image; thumbnail can be "self", "default", or blank
         if (thumbnail == null || thumbnail.isBlank() || thumbnail.equals("self") || thumbnail.equals("default")) {
             thumbnail = null;
         }

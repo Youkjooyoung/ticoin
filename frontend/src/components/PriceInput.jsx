@@ -18,7 +18,7 @@ export default function PriceInput({
       return;
     }
     const num = Number(raw);
-    if (isNaN(num) || num < 0) return; // 음수 차단
+    if (isNaN(num) || num < 0) return;
     onChange(raw);
   };
 

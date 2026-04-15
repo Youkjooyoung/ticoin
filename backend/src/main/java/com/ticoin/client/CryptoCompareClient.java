@@ -37,7 +37,6 @@ public class CryptoCompareClient {
 
             if (resp == null) return List.of();
 
-            // CryptoCompare returns error object when auth key missing
             if ("Error".equals(resp.get("Response"))) {
                 log.debug("CryptoCompare auth required: {}", resp.get("Message"));
                 return List.of();
