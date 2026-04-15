@@ -1,5 +1,7 @@
-import { Plus, Bell } from 'lucide-react';
+import { useState } from 'react';
 import { useLocation } from 'react-router-dom';
+import NotificationDropdown from './NotificationDropdown.jsx';
+import QuickCreateDropdown from './QuickCreateDropdown.jsx';
 
 const TITLES = {
   '/': '피드',
@@ -14,19 +16,24 @@ const TITLES = {
 export default function Header() {
   const { pathname } = useLocation();
   const title = TITLES[pathname] ?? 'ticoin';
+  const [createOpen, setCreateOpen] = useState(false);
+  const [notifOpen, setNotifOpen] = useState(false);
 
   return (
     <header className="sticky top-0 z-20 bg-bg/80 backdrop-blur border-b border-border">
       <div className="max-w-[900px] mx-auto px-4 md:px-8 h-16 flex items-center justify-between">
         <h2 className="text-lg font-bold tracking-tight">{title}</h2>
         <div className="flex items-center gap-2">
-          <button className="w-9 h-9 rounded-full bg-bg-soft border border-border flex items-center justify-center hover:bg-bg-elev transition-colors">
-            <Plus className="w-4 h-4" />
-          </button>
-          <button className="w-9 h-9 rounded-full bg-bg-soft border border-border flex items-center justify-center relative hover:bg-bg-elev transition-colors">
-            <Bell className="w-4 h-4" />
-            <span className="absolute top-1.5 right-1.5 w-2 h-2 rounded-full bg-down" />
-          </button>
+          <QuickCreateDropdown
+            open={createOpen}
+            onOpen={() => { setCreateOpen((v) => !v); setNotifOpen(false); }}
+            onClose={() => setCreateOpen(false)}
+          />
+          <NotificationDropdown
+            open={notifOpen}
+            onOpen={() => { setNotifOpen((v) => !v); setCreateOpen(false); }}
+            onClose={() => setNotifOpen(false)}
+          />
         </div>
       </div>
     </header>

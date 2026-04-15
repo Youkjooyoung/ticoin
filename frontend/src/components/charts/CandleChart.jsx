@@ -1,20 +1,36 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 export default function CandleChart({ data = [], height = 240, showVolume = true, showMA = true }) {
   const canvasRef = useRef(null);
+  const wrapRef = useRef(null);
+  const [size, setSize] = useState({ w: 0, h: height });
+
+  // 부모 크기를 ResizeObserver로 추적 (초기 레이아웃 타이밍 이슈 해결)
+  useEffect(() => {
+    const el = wrapRef.current;
+    if (!el) return;
+    const update = () => {
+      const r = el.getBoundingClientRect();
+      if (r.width > 0 && r.height > 0) setSize({ w: r.width, h: r.height });
+    };
+    update();
+    const ro = new ResizeObserver(update);
+    ro.observe(el);
+    return () => ro.disconnect();
+  }, []);
 
   useEffect(() => {
     const canvas = canvasRef.current;
-    if (!canvas || !data.length) return;
+    if (!canvas || !data.length || size.w === 0) return;
     const dpr = window.devicePixelRatio || 1;
-    const rect = canvas.getBoundingClientRect();
-    canvas.width = rect.width * dpr;
-    canvas.height = rect.height * dpr;
+    canvas.width = size.w * dpr;
+    canvas.height = size.h * dpr;
     const ctx = canvas.getContext('2d');
+    ctx.setTransform(1, 0, 0, 1, 0, 0);
     ctx.scale(dpr, dpr);
 
-    const W = rect.width;
-    const H = rect.height;
+    const W = size.w;
+    const H = size.h;
     const padL = 8;
     const padR = 54;
     const padT = 12;
@@ -104,10 +120,10 @@ export default function CandleChart({ data = [], height = 240, showVolume = true
       ctx.textAlign = 'left';
       ctx.fillText(last.close.toFixed(last.close < 10 ? 4 : 2), W - padR + 3, yLast + 3);
     }
-  }, [data, height, showVolume, showMA]);
+  }, [data, size, showVolume, showMA]);
 
   return (
-    <div className="relative w-full" style={{ height }}>
+    <div ref={wrapRef} className="relative w-full" style={{ height }}>
       <canvas ref={canvasRef} className="w-full h-full block" />
     </div>
   );

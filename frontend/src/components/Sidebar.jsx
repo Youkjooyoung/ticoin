@@ -15,10 +15,10 @@ const NAV = [
 export default function Sidebar() {
   return (
     <aside className="hidden md:flex fixed inset-y-0 left-0 w-60 flex-col border-r border-border bg-bg-elev z-30">
-      <div className="px-6 pt-8 pb-6">
+      <NavLink to="/" end className="block px-6 pt-8 pb-6 hover:opacity-90 transition-opacity">
         <h1 className="text-2xl font-extrabold gradient-text">ticoin</h1>
         <p className="text-xs text-text-3 mt-1">주식 & 코인 소셜</p>
-      </div>
+      </NavLink>
       <nav className="flex-1 px-3 space-y-1">
         {NAV.map(({ to, label, icon: Icon }) => (
           <NavLink

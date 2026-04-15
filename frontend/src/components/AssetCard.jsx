@@ -1,7 +1,8 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useMemo, useState } from 'react';
 import { Heart, MessageCircle, Share2, Bookmark } from 'lucide-react';
 import CandleChart from './charts/CandleChart.jsx';
-import { marketApi } from '../api/market.js';
+import CommentPanel from './CommentPanel.jsx';
+import { useBinanceKlines } from '../hooks/useBinanceKlines.js';
 import { useMarketStore } from '../stores/marketStore.js';
 import { cn, fmtPrice, fmtPct, fmtCompact, changeClass } from '../lib/utils.js';
 
@@ -25,25 +26,23 @@ function generateMockCandles(seed = 100, length = 30) {
 
 export default function AssetCard({ asset, onOpen }) {
   const [interval, setInterval] = useState('1H');
-  const [candles, setCandles] = useState([]);
   const [liked, setLiked] = useState(false);
   const [saved, setSaved] = useState(false);
+  const [commentOpen, setCommentOpen] = useState(false);
   const flash = useMarketStore((s) => s.flashes[asset.symbol]);
 
-  const fallback = useMemo(() => generateMockCandles(asset.price || 100, 30), [asset.price]);
+  // Crypto: Binance 실제 klines, Stock: mock (backend Yahoo는 401로 동작 안 함)
+  const { candles: binanceCandles, loading: klinesLoading } = useBinanceKlines(
+    asset.type === 'CRYPTO' ? asset.symbol : null,
+    interval
+  );
 
-  useEffect(() => {
-    let ignore = false;
-    marketApi
-      .candles(asset.type === 'CRYPTO' ? asset.name?.toLowerCase() : asset.symbol, asset.type, interval)
-      .then((d) => {
-        if (ignore) return;
-        if (Array.isArray(d) && d.length > 3) setCandles(d);
-        else setCandles(fallback);
-      })
-      .catch(() => setCandles(fallback));
-    return () => { ignore = true; };
-  }, [asset.symbol, asset.type, interval, fallback]);
+  const fallback = useMemo(
+    () => generateMockCandles(asset.price || 100, 50),
+    [asset.price, interval]
+  );
+
+  const candles = binanceCandles.length > 0 ? binanceCandles : fallback;
 
   const up = (asset.changePercent24h ?? 0) >= 0;
   const last = candles[candles.length - 1] || { open: 0, high: 0, low: 0, close: 0, volume: 0 };
@@ -70,7 +69,7 @@ export default function AssetCard({ asset, onOpen }) {
         <div className="text-right">
           <p
             className={cn(
-              'text-lg font-extrabold mono flex items-center gap-1.5 transition-colors duration-500',
+              'text-lg font-extrabold mono flex items-center gap-1.5 transition-colors duration-300',
               flash === 'up' && 'text-up',
               flash === 'down' && 'text-down'
             )}
@@ -120,6 +119,9 @@ export default function AssetCard({ asset, onOpen }) {
             {iv}
           </button>
         ))}
+        {klinesLoading && (
+          <span className="text-[10px] text-text-3 ml-2 self-center">로딩...</span>
+        )}
       </div>
 
       <div className="grid grid-cols-2 gap-4 mt-4 pt-4 border-t border-border">
@@ -139,9 +141,15 @@ export default function AssetCard({ asset, onOpen }) {
             <Heart className={cn('w-5 h-5', liked && 'fill-down text-down')} />
             <span className="text-xs mono">{(12453 + (liked ? 1 : 0)).toLocaleString()}</span>
           </button>
-          <button className="flex items-center gap-1.5 text-text-3 hover:text-text-1 transition-colors">
+          <button
+            onClick={() => setCommentOpen((v) => !v)}
+            className={cn(
+              'flex items-center gap-1.5 transition-colors',
+              commentOpen ? 'text-brand-light' : 'text-text-3 hover:text-text-1'
+            )}
+          >
             <MessageCircle className="w-5 h-5" />
-            <span className="text-xs mono">342</span>
+            <span className="text-xs mono">댓글</span>
           </button>
           <button className="text-text-3 hover:text-text-1 transition-colors">
             <Share2 className="w-5 h-5" />
@@ -151,6 +159,8 @@ export default function AssetCard({ asset, onOpen }) {
           <Bookmark className={cn('w-5 h-5', saved && 'fill-brand-light text-brand-light')} />
         </button>
       </footer>
+
+      <CommentPanel symbol={asset.symbol} open={commentOpen} />
     </article>
   );
 }
