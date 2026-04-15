@@ -1,0 +1,13 @@
+logging:
+  level:
+    com.ticoin: DEBUG
+    org.springframework.web: DEBUG
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss.SSS} %-5level [%thread] [%X{deviceId:-}] %logger{36} - %msg%n"
+
+spring:
+  jpa:
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
