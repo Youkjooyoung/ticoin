@@ -1,7 +1,9 @@
 package com.ticoin.controller;
 
+import com.ticoin.dto.WatchlistCreateRequest;
 import com.ticoin.entity.Watchlist;
 import com.ticoin.service.WatchlistService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
@@ -20,8 +22,8 @@ public class WatchlistController {
     }
 
     @PostMapping
-    public Watchlist create(@RequestBody Watchlist w) {
-        return watchlistService.create(w);
+    public Watchlist create(@Valid @RequestBody WatchlistCreateRequest req) {
+        return watchlistService.create(req);
     }
 
     @PatchMapping("/{id}/alert")

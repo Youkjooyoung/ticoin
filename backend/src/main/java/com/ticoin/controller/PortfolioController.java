@@ -1,7 +1,9 @@
 package com.ticoin.controller;
 
+import com.ticoin.dto.PortfolioCreateRequest;
 import com.ticoin.entity.Portfolio;
 import com.ticoin.service.PortfolioService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
@@ -20,8 +22,8 @@ public class PortfolioController {
     }
 
     @PostMapping
-    public Portfolio create(@RequestBody Portfolio p) {
-        return portfolioService.create(p);
+    public Portfolio create(@Valid @RequestBody PortfolioCreateRequest req) {
+        return portfolioService.create(req);
     }
 
     @DeleteMapping("/{id}")
