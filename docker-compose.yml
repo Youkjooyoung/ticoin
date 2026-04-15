@@ -1,0 +1,47 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: ticoin-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ticoin
+      POSTGRES_USER: ticoin
+      POSTGRES_PASSWORD: ticoin
+    ports:
+      - "5433:5432"
+    volumes:
+      - ticoin-pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ticoin -d ticoin"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  backend:
+    build: ./backend
+    container_name: ticoin-backend
+    restart: unless-stopped
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      DB_HOST: postgres
+      DB_PORT: 5432
+      DB_NAME: ticoin
+      DB_USER: ticoin
+      DB_PASSWORD: ticoin
+      CMC_API_KEY: ${CMC_API_KEY:-}
+    ports:
+      - "8090:8090"
+
+  frontend:
+    build: ./frontend
+    container_name: ticoin-frontend
+    restart: unless-stopped
+    depends_on:
+      - backend
+    ports:
+      - "5174:80"
+
+volumes:
+  ticoin-pgdata:

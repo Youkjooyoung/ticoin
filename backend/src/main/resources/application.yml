@@ -1,0 +1,42 @@
+server:
+  port: 8090
+
+spring:
+  application:
+    name: ticoin-backend
+  datasource:
+    url: jdbc:postgresql://${DB_HOST:localhost}:${DB_PORT:5432}/${DB_NAME:ticoin}
+    username: ${DB_USER:ticoin}
+    password: ${DB_PASSWORD:ticoin}
+    driver-class-name: org.postgresql.Driver
+  jpa:
+    hibernate:
+      ddl-auto: update
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+        format_sql: true
+    open-in-view: false
+  cache:
+    type: caffeine
+    caffeine:
+      spec: maximumSize=500,expireAfterWrite=60s
+
+ticoin:
+  cors:
+    allowed-origins: http://localhost:5173,http://localhost:3000
+  api:
+    coingecko:
+      base-url: https://api.coingecko.com/api/v3
+    yahoo:
+      base-url: https://query1.finance.yahoo.com
+    cryptocompare:
+      base-url: https://min-api.cryptocompare.com
+    coinmarketcap:
+      base-url: https://pro-api.coinmarketcap.com/v1
+      api-key: ${CMC_API_KEY:}
+
+logging:
+  level:
+    com.ticoin: DEBUG
+    org.springframework.web: INFO
