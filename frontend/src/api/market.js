@@ -33,3 +33,14 @@ export const alertApi = {
   create: (a) => api.post('/alerts', a).then((r) => r.data),
   delete: (id) => api.delete(`/alerts/${id}`).then((r) => r.data),
 };
+
+export const commentApi = {
+  list: (symbol) => api.get('/comments', { params: { symbol } }).then((r) => r.data),
+  create: (c) => api.post('/comments', c).then((r) => r.data),
+  delete: (id) => api.delete(`/comments/${id}`).then((r) => r.data),
+};
+
+export const profileApi = {
+  get: () => api.get('/profile').then((r) => r.data),
+  update: (p) => api.put('/profile', p).then((r) => r.data),
+};

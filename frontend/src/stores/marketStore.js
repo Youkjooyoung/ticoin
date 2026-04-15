@@ -56,8 +56,12 @@ export const useMarketStore = create((set, get) => ({
 
   updatePrice: (symbol, newPrice) => {
     const cur = get().feed;
+    let flashDir = null;
     const next = cur.map((a) => {
       if (a.symbol !== symbol) return a;
+      if (a.price != null && a.price !== newPrice) {
+        flashDir = newPrice > a.price ? 'up' : 'down';
+      }
       const base = a.price - (a.change24h ?? 0);
       return {
         ...a,
@@ -66,7 +70,18 @@ export const useMarketStore = create((set, get) => ({
         changePercent24h: base ? ((newPrice - base) / base) * 100 : 0,
       };
     });
-    set({ feed: next });
+    if (flashDir) {
+      const flashes = { ...get().flashes, [symbol]: flashDir };
+      set({ feed: next, flashes });
+      setTimeout(() => {
+        const state = get();
+        const cleared = { ...state.flashes };
+        delete cleared[symbol];
+        set({ flashes: cleared });
+      }, 600);
+    } else {
+      set({ feed: next });
+    }
   },
 
   mergeFeed: (incoming) => {
