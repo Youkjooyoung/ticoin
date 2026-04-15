@@ -36,10 +36,22 @@ public class CryptoCompareClient {
                     .block();
 
             if (resp == null) return List.of();
-            List<Map<String, Object>> data = (List<Map<String, Object>>) resp.get("Data");
-            if (data == null) return List.of();
 
-            return data.stream().limit(30).map(this::mapToNews).toList();
+            // CryptoCompare returns error object when auth key missing
+            if ("Error".equals(resp.get("Response"))) {
+                log.debug("CryptoCompare auth required: {}", resp.get("Message"));
+                return List.of();
+            }
+
+            Object dataObj = resp.get("Data");
+            if (!(dataObj instanceof List<?> list)) return List.of();
+
+            return list.stream()
+                    .filter(item -> item instanceof Map)
+                    .map(item -> (Map<String, Object>) item)
+                    .limit(30)
+                    .map(this::mapToNews)
+                    .toList();
         } catch (Exception e) {
             log.warn("CryptoCompare news fetch failed: {}", e.getMessage());
             return List.of();
