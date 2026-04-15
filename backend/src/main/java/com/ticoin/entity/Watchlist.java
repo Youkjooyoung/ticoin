@@ -7,7 +7,11 @@ import java.math.BigDecimal;
 import java.time.Instant;
 
 @Entity
-@Table(name = "watchlist", uniqueConstraints = @UniqueConstraint(columnNames = {"symbol"}))
+@Table(
+        name = "watchlist",
+        uniqueConstraints = @UniqueConstraint(name = "watchlist_device_symbol_uk", columnNames = {"device_id", "symbol"}),
+        indexes = @Index(name = "idx_watchlist_device", columnList = "device_id")
+)
 @Getter
 @Setter
 @NoArgsConstructor
@@ -18,6 +22,9 @@ public class Watchlist {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
+    @Column(name = "device_id", nullable = false, length = 64)
+    private String deviceId;
 
     @Column(nullable = false, length = 20)
     private String symbol;

@@ -1,5 +1,6 @@
 package com.ticoin.controller;
 
+import com.ticoin.config.DeviceIdArgumentResolver.DeviceId;
 import com.ticoin.dto.WatchlistCreateRequest;
 import com.ticoin.entity.Watchlist;
 import com.ticoin.service.WatchlistService;
@@ -17,22 +18,22 @@ public class WatchlistController {
     private final WatchlistService watchlistService;
 
     @GetMapping
-    public List<Watchlist> list() {
-        return watchlistService.findAll();
+    public List<Watchlist> list(@DeviceId String deviceId) {
+        return watchlistService.findAll(deviceId);
     }
 
     @PostMapping
-    public Watchlist create(@Valid @RequestBody WatchlistCreateRequest req) {
-        return watchlistService.create(req);
+    public Watchlist create(@DeviceId String deviceId, @Valid @RequestBody WatchlistCreateRequest req) {
+        return watchlistService.create(deviceId, req);
     }
 
     @PatchMapping("/{id}/alert")
-    public Watchlist toggleAlert(@PathVariable Long id) {
-        return watchlistService.toggleAlert(id);
+    public Watchlist toggleAlert(@DeviceId String deviceId, @PathVariable Long id) {
+        return watchlistService.toggleAlert(deviceId, id);
     }
 
     @DeleteMapping("/{id}")
-    public void delete(@PathVariable Long id) {
-        watchlistService.delete(id);
+    public void delete(@DeviceId String deviceId, @PathVariable Long id) {
+        watchlistService.delete(deviceId, id);
     }
 }

@@ -18,12 +18,13 @@ public class PortfolioService {
     private final PortfolioRepository portfolioRepository;
 
     @Transactional(readOnly = true)
-    public List<Portfolio> findAll() {
-        return portfolioRepository.findAll();
+    public List<Portfolio> findAll(String deviceId) {
+        return portfolioRepository.findByDeviceIdOrderByCreatedAtDesc(deviceId);
     }
 
-    public Portfolio create(PortfolioCreateRequest req) {
+    public Portfolio create(String deviceId, PortfolioCreateRequest req) {
         Portfolio p = Portfolio.builder()
+                .deviceId(deviceId)
                 .symbol(req.symbol().toUpperCase())
                 .name(req.name())
                 .type(req.type().toUpperCase())
@@ -33,10 +34,10 @@ public class PortfolioService {
         return portfolioRepository.save(p);
     }
 
-    public void delete(Long id) {
-        if (!portfolioRepository.existsById(id)) {
+    public void delete(String deviceId, Long id) {
+        long removed = portfolioRepository.deleteByIdAndDeviceId(id, deviceId);
+        if (removed == 0) {
             throw new EntityNotFoundException("포트폴리오 항목을 찾을 수 없습니다: " + id);
         }
-        portfolioRepository.deleteById(id);
     }
 }

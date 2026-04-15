@@ -7,13 +7,15 @@ import java.math.BigDecimal;
 import java.time.Instant;
 
 @Entity
-@Table(name = "portfolio", indexes = @Index(name = "idx_portfolio_device", columnList = "device_id"))
+@Table(name = "price_alert", indexes = @Index(name = "idx_alert_device", columnList = "device_id"))
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class Portfolio {
+public class PriceAlert {
+
+    public enum Condition { ABOVE, BELOW }
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -31,11 +33,18 @@ public class Portfolio {
     @Column(nullable = false, length = 10)
     private String type;
 
-    @Column(nullable = false, precision = 20, scale = 8)
-    private BigDecimal quantity;
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false, length = 10)
+    private Condition condition;
 
-    @Column(name = "avg_price", nullable = false, precision = 20, scale = 8)
-    private BigDecimal avgPrice;
+    @Column(nullable = false, precision = 20, scale = 8)
+    private BigDecimal target;
+
+    @Column(nullable = false)
+    private boolean triggered;
+
+    @Column(name = "triggered_at")
+    private Instant triggeredAt;
 
     @Column(name = "created_at", nullable = false)
     private Instant createdAt;
