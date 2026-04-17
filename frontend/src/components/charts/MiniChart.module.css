@@ -1,0 +1,6 @@
+.placeholder {
+  width: var(--w, 80px);
+  height: var(--h, 28px);
+  background-color: var(--bg-soft);
+  border-radius: 0.25rem;
+}

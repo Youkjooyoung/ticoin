@@ -9,6 +9,7 @@ import ListSkeleton from '../components/skeletons/ListSkeleton.jsx';
 import SymbolSelect from '../components/SymbolSelect.jsx';
 import PriceInput from '../components/PriceInput.jsx';
 import { cn, fmtPrice, fmtPct, changeClass } from '../lib/utils.js';
+import styles from './Portfolio.module.css';
 
 const DONUT_COLORS = ['#8B5CF6', '#10B981', '#F59E0B', '#3B82F6', '#EF4444', '#EC4899', '#06B6D4'];
 
@@ -131,7 +132,7 @@ export default function Portfolio() {
             <div className="flex-1 space-y-2 min-w-[200px]">
               {allocations.map((a) => (
                 <div key={a.symbol} className="flex items-center gap-2 text-xs">
-                  <span className="w-2.5 h-2.5 rounded-sm" style={{ background: a.color }} />
+                  <span className={styles.colorDot} style={{ '--dot-color': a.color }} />
                   <span className="font-semibold flex-1">{a.symbol}</span>
                   <span className="mono text-text-2">{a.pct.toFixed(1)}%</span>
                 </div>

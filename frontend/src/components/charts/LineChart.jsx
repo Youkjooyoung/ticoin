@@ -1,4 +1,5 @@
 import { useId, useMemo } from 'react';
+import styles from './LineChart.module.css';
 
 export default function LineChart({
   data = [],
@@ -25,14 +26,14 @@ export default function LineChart({
 
   if (!data.length) {
     return (
-      <div style={{ height }} className="flex items-center justify-center text-text-3 text-sm">
+      <div className={styles.empty} style={{ '--h': `${height}px` }}>
         데이터 없음
       </div>
     );
   }
 
   return (
-    <div className="relative w-full" style={{ height }}>
+    <div className={styles.wrapper} style={{ '--h': `${height}px` }}>
       <svg viewBox={`0 0 600 ${height}`} preserveAspectRatio="none" className="w-full h-full overflow-visible">
         <defs>
           <linearGradient id={`lg-${gradId}`} x1="0" x2="0" y1="0" y2="1">
@@ -42,18 +43,18 @@ export default function LineChart({
         </defs>
         {showGrid && Array.from({ length: 4 }).map((_, i) => {
           const y = 10 + ((height - 30) / 4) * (i + 1);
-          return <line key={i} x1="0" x2="600" y1={y} y2={y} stroke="#1A1A24" strokeWidth="1" />;
+          return <line key={i} x1="0" x2="600" y1={y} y2={y} stroke="rgb(var(--border))" strokeWidth="1" />;
         })}
         <polygon points={areaPoints} fill={`url(#lg-${gradId})`} />
         <polyline points={points} fill="none" stroke={color} strokeWidth="2" strokeLinejoin="round" strokeLinecap="round" />
       </svg>
       {showAxis && (
-        <div className="absolute top-0 right-0 text-[10px] text-text-3 mono">
+        <div className={styles.axisTop}>
           <div>{max.toFixed(2)}</div>
         </div>
       )}
       {showAxis && (
-        <div className="absolute bottom-0 right-0 text-[10px] text-text-3 mono">
+        <div className={styles.axisBottom}>
           <div>{min.toFixed(2)}</div>
         </div>
       )}

@@ -1,6 +1,8 @@
 import { useEffect, useState } from 'react';
 import { toBinanceSymbol, BINANCE_INTERVAL } from '../lib/binance.js';
 
+const BINANCE_REST_URL = import.meta.env.VITE_BINANCE_REST_URL || 'https://api.binance.com';
+
 export function useBinanceKlines(symbol, interval, limit = 100) {
   const [candles, setCandles] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -16,7 +18,7 @@ export function useBinanceKlines(symbol, interval, limit = 100) {
     setLoading(true);
     setError(null);
 
-    fetch(`https://api.binance.com/api/v3/klines?symbol=${bSym}&interval=${bInt}&limit=${limit}`)
+    fetch(`${BINANCE_REST_URL}/api/v3/klines?symbol=${bSym}&interval=${bInt}&limit=${limit}`)
       .then((r) => (r.ok ? r.json() : Promise.reject(new Error(`HTTP ${r.status}`))))
       .then((data) => {
         if (cancelled) return;

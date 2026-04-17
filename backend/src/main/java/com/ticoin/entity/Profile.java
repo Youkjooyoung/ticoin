@@ -27,8 +27,11 @@ public class Profile {
     @Column(length = 200)
     private String bio;
 
-    @Column(name = "avatar_url", length = 2048)
+    @Column(name = "avatar_url", columnDefinition = "TEXT")
     private String avatarUrl;
+
+    @Column(name = "user_id")
+    private Long userId;
 
     @Column(name = "created_at", nullable = false)
     private Instant createdAt;

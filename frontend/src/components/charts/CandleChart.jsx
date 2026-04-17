@@ -1,9 +1,13 @@
 import { useEffect, useRef, useState } from 'react';
+import styles from './CandleChart.module.css';
+import { readThemeColors } from '../../lib/themeColors.js';
+import { useThemeStore } from '../../stores/themeStore.js';
 
 export default function CandleChart({ data = [], height = 240, showVolume = true, showMA = true }) {
   const canvasRef = useRef(null);
   const wrapRef = useRef(null);
   const [size, setSize] = useState({ w: 0, h: height });
+  const themeMode = useThemeStore((s) => s.mode);
 
   useEffect(() => {
     const el = wrapRef.current;
@@ -28,6 +32,7 @@ export default function CandleChart({ data = [], height = 240, showVolume = true
     ctx.setTransform(1, 0, 0, 1, 0, 0);
     ctx.scale(dpr, dpr);
 
+    const colors = readThemeColors();
     const W = size.w;
     const H = size.h;
     const padL = 8;
@@ -43,10 +48,10 @@ export default function CandleChart({ data = [], height = 240, showVolume = true
     const rng = maxP - minP || 1;
     const maxV = Math.max(...data.map((d) => d.volume || 0), 1);
 
-    ctx.fillStyle = '#0B0B0F';
+    ctx.fillStyle = colors.bgElev;
     ctx.fillRect(0, 0, W, H);
 
-    ctx.strokeStyle = '#1A1A24';
+    ctx.strokeStyle = colors.border;
     ctx.lineWidth = 1;
     for (let i = 0; i <= 4; i++) {
       const y = padT + (chartH / 4) * i;
@@ -55,7 +60,7 @@ export default function CandleChart({ data = [], height = 240, showVolume = true
       ctx.lineTo(W - padR, y);
       ctx.stroke();
       const p = maxP - (rng / 4) * i;
-      ctx.fillStyle = '#71717A';
+      ctx.fillStyle = colors.text3;
       ctx.font = '10px "JetBrains Mono", monospace';
       ctx.textAlign = 'left';
       ctx.fillText(p.toFixed(p < 10 ? 4 : 2), W - padR + 4, y + 3);
@@ -67,7 +72,7 @@ export default function CandleChart({ data = [], height = 240, showVolume = true
     data.forEach((d, i) => {
       const x = padL + i * cw + cw / 2;
       const isUp = d.close >= d.open;
-      const color = isUp ? '#10B981' : '#EF4444';
+      const color = isUp ? colors.up : colors.down;
       const yHigh = padT + ((maxP - d.high) / rng) * chartH;
       const yLow = padT + ((maxP - d.low) / rng) * chartH;
       const yOpen = padT + ((maxP - d.open) / rng) * chartH;
@@ -97,7 +102,7 @@ export default function CandleChart({ data = [], height = 240, showVolume = true
         const x = padL + i * cw + cw / 2;
         const isUp = d.close >= d.open;
         const h = ((d.volume || 0) / maxV) * (volH - 4);
-        ctx.fillStyle = isUp ? 'rgba(16, 185, 129, 0.5)' : 'rgba(239, 68, 68, 0.5)';
+        ctx.fillStyle = isUp ? colors.upSoft : colors.downSoft;
         ctx.fillRect(x - bw / 2, volY + (volH - h - 4), bw, h);
       });
     }
@@ -106,24 +111,24 @@ export default function CandleChart({ data = [], height = 240, showVolume = true
     if (last) {
       const yLast = padT + ((maxP - last.close) / rng) * chartH;
       ctx.setLineDash([4, 4]);
-      ctx.strokeStyle = last.close >= last.open ? '#10B981' : '#EF4444';
+      ctx.strokeStyle = last.close >= last.open ? colors.up : colors.down;
       ctx.beginPath();
       ctx.moveTo(padL, yLast);
       ctx.lineTo(W - padR, yLast);
       ctx.stroke();
       ctx.setLineDash([]);
-      ctx.fillStyle = last.close >= last.open ? '#10B981' : '#EF4444';
+      ctx.fillStyle = last.close >= last.open ? colors.up : colors.down;
       ctx.fillRect(W - padR, yLast - 9, padR - 4, 18);
       ctx.fillStyle = '#fff';
       ctx.font = 'bold 10px "JetBrains Mono", monospace';
       ctx.textAlign = 'left';
       ctx.fillText(last.close.toFixed(last.close < 10 ? 4 : 2), W - padR + 3, yLast + 3);
     }
-  }, [data, size, showVolume, showMA]);
+  }, [data, size, showVolume, showMA, themeMode]);
 
   return (
-    <div ref={wrapRef} className="relative w-full" style={{ height }}>
-      <canvas ref={canvasRef} className="w-full h-full block" />
+    <div ref={wrapRef} className={styles.wrapper} style={{ '--chart-height': `${height}px` }}>
+      <canvas ref={canvasRef} className={styles.canvas} />
     </div>
   );
 }

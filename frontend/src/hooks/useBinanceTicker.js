@@ -2,6 +2,8 @@ import { useEffect, useRef } from 'react';
 import { toBinanceSymbol, fromBinanceSymbol } from '../lib/binance.js';
 import { useMarketStore } from '../stores/marketStore.js';
 
+const BINANCE_WS_URL = import.meta.env.VITE_BINANCE_WS_URL || 'wss://stream.binance.com:9443';
+
 export function useBinanceTicker(symbols) {
   const updatePrice = useMarketStore((s) => s.updatePrice);
   const wsRef = useRef(null);
@@ -18,7 +20,7 @@ export function useBinanceTicker(symbols) {
 
     if (!streams) return;
 
-    const url = `wss://stream.binance.com:9443/stream?streams=${streams}`;
+    const url = `${BINANCE_WS_URL}/stream?streams=${streams}`;
     const ws = new WebSocket(url);
 
     ws.onmessage = (evt) => {

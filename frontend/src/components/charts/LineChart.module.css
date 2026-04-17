@@ -1,0 +1,32 @@
+.wrapper {
+  position: relative;
+  width: 100%;
+  height: var(--h, 200px);
+}
+
+.empty {
+  height: var(--h, 200px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-3);
+  font-size: 0.875rem;
+}
+
+.axisTop {
+  position: absolute;
+  top: 0;
+  right: 0;
+  font-size: 10px;
+  font-family: 'JetBrains Mono', monospace;
+  color: var(--text-3);
+}
+
+.axisBottom {
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  font-size: 10px;
+  font-family: 'JetBrains Mono', monospace;
+  color: var(--text-3);
+}
