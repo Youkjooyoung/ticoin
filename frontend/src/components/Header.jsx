@@ -1,21 +1,24 @@
 import { useState } from 'react';
 import { useLocation } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import NotificationDropdown from './NotificationDropdown.jsx';
 import QuickCreateDropdown from './QuickCreateDropdown.jsx';
 
-const TITLES = {
-  '/': '피드',
-  '/search': '검색',
-  '/trending': '트렌딩',
-  '/portfolio': '포트폴리오',
-  '/watchlist': '관심목록',
-  '/alerts': '가격 알림',
-  '/profile': '프로필',
+const TITLE_KEYS = {
+  '/': 'home.feedTitle',
+  '/search': 'nav.search',
+  '/trending': 'nav.trending',
+  '/portfolio': 'nav.portfolio',
+  '/watchlist': 'nav.watchlist',
+  '/alerts': 'nav.alerts',
+  '/profile': 'nav.profile',
+  '/settings': 'nav.settings',
 };
 
 export default function Header() {
   const { pathname } = useLocation();
-  const title = TITLES[pathname] ?? 'ticoin';
+  const { t } = useTranslation();
+  const title = TITLE_KEYS[pathname] ? t(TITLE_KEYS[pathname]) : t('app.name');
   const [createOpen, setCreateOpen] = useState(false);
   const [notifOpen, setNotifOpen] = useState(false);
 

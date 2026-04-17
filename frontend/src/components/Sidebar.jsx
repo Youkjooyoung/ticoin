@@ -1,26 +1,28 @@
 import { NavLink } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { Home, Search, TrendingUp, Wallet, Star, Bell, User, Settings } from 'lucide-react';
 import { cn } from '../lib/utils.js';
 
 const NAV = [
-  { to: '/', label: '홈', icon: Home },
-  { to: '/search', label: '검색', icon: Search },
-  { to: '/trending', label: '트렌딩', icon: TrendingUp },
-  { to: '/portfolio', label: '포트폴리오', icon: Wallet },
-  { to: '/watchlist', label: '관심목록', icon: Star },
-  { to: '/alerts', label: '가격 알림', icon: Bell },
-  { to: '/profile', label: '프로필', icon: User },
+  { to: '/', key: 'nav.home', icon: Home },
+  { to: '/search', key: 'nav.search', icon: Search },
+  { to: '/trending', key: 'nav.trending', icon: TrendingUp },
+  { to: '/portfolio', key: 'nav.portfolio', icon: Wallet },
+  { to: '/watchlist', key: 'nav.watchlist', icon: Star },
+  { to: '/alerts', key: 'nav.alerts', icon: Bell },
+  { to: '/profile', key: 'nav.profile', icon: User },
 ];
 
 export default function Sidebar() {
+  const { t } = useTranslation();
   return (
-    <aside className="hidden md:flex fixed inset-y-0 left-0 w-60 flex-col border-r border-border bg-bg-elev z-30">
+    <aside className="hidden md:flex fixed inset-y-0 left-0 w-60 flex-col border-r border-[var(--border)] bg-[var(--surface-1)] backdrop-blur-lg z-30">
       <NavLink to="/" end className="block px-6 pt-8 pb-6 hover:opacity-90 transition-opacity">
-        <h1 className="text-2xl font-extrabold gradient-text">ticoin</h1>
-        <p className="text-xs text-text-3 mt-1">주식 & 코인 소셜</p>
+        <h1 className="text-2xl font-extrabold gradient-text">{t('app.name')}</h1>
+        <p className="text-xs text-text-3 mt-1">{t('app.tagline')}</p>
       </NavLink>
       <nav className="flex-1 px-3 space-y-1">
-        {NAV.map(({ to, label, icon: Icon }) => (
+        {NAV.map(({ to, key, icon: Icon }) => (
           <NavLink
             key={to}
             to={to}
@@ -37,18 +39,28 @@ export default function Sidebar() {
             {({ isActive }) => (
               <>
                 <Icon className={cn('w-5 h-5', isActive && 'text-brand-light')} />
-                <span>{label}</span>
+                <span>{t(key)}</span>
                 {isActive && <span className="ml-auto w-1.5 h-1.5 rounded-full bg-brand" />}
               </>
             )}
           </NavLink>
         ))}
       </nav>
-      <div className="p-3 border-t border-border">
-        <button className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm text-text-2 hover:bg-bg-soft hover:text-text-1 transition-colors">
+      <div className="p-3 border-t border-[var(--border)]">
+        <NavLink
+          to="/settings"
+          className={({ isActive }) =>
+            cn(
+              'w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm transition-colors',
+              isActive
+                ? 'bg-brand-soft text-brand-light font-semibold'
+                : 'text-text-2 hover:bg-bg-soft hover:text-text-1'
+            )
+          }
+        >
           <Settings className="w-5 h-5" />
-          <span>설정</span>
-        </button>
+          <span>{t('nav.settings')}</span>
+        </NavLink>
       </div>
     </aside>
   );

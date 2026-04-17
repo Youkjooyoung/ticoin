@@ -1,0 +1,110 @@
+{
+  "app": {
+    "name": "ticoin",
+    "tagline": "내 자산을 한번에",
+    "version": "ticoin v0.6.0 · 내 자산을 한번에"
+  },
+  "nav": {
+    "home": "홈",
+    "search": "검색",
+    "trending": "트렌딩",
+    "portfolio": "포트폴리오",
+    "watchlist": "관심목록",
+    "alerts": "가격 알림",
+    "profile": "프로필",
+    "settings": "설정",
+    "feed": "피드"
+  },
+  "common": {
+    "save": "저장",
+    "cancel": "취소",
+    "delete": "삭제",
+    "edit": "편집",
+    "add": "추가",
+    "close": "닫기",
+    "loading": "불러오는 중…",
+    "error": "오류",
+    "success": "성공",
+    "remove": "제거",
+    "confirm": "확인"
+  },
+  "settings": {
+    "title": "설정",
+    "subtitle": "앱 환경을 내 취향에 맞게 조정하세요",
+    "section": {
+      "theme": "테마",
+      "language": "언어",
+      "notifications": "알림",
+      "support": "지원"
+    },
+    "theme": {
+      "light": "라이트",
+      "dark": "다크",
+      "system": "시스템",
+      "switched": "{{mode}} 모드로 전환"
+    },
+    "language": {
+      "label": "언어",
+      "changed": "언어가 {{label}}(으)로 변경되었습니다"
+    },
+    "menu": {
+      "priceAlerts": "가격 알림",
+      "priceAlertsDesc": "활성화됨",
+      "privacy": "개인정보 및 보안",
+      "privacyDesc": "공개 프로필",
+      "helpCenter": "도움말 및 지원",
+      "appVersion": "앱 버전",
+      "logout": "로그아웃",
+      "logoutConfirm": "정말 로그아웃 하시겠습니까? 이 기기의 데이터는 유지됩니다."
+    }
+  },
+  "profile": {
+    "followers": "팔로워",
+    "following": "팔로잉",
+    "posts": "포스트",
+    "totalReturn": "총 수익률",
+    "rank": "랭킹",
+    "likes": "받은 좋아요",
+    "comments": "댓글",
+    "trackedAssets": "추적 중인 자산",
+    "cryptoNews": "최신 크립토 뉴스",
+    "newsSource": "Google News · CryptoCompare",
+    "newsError": "뉴스를 불러오지 못했습니다. 백엔드 또는 외부 API를 확인해주세요.",
+    "defaultBio": "주식 & 코인 투자자",
+    "defaultNickname": "guest",
+    "edit": "프로필 편집",
+    "nickname": "닉네임",
+    "bio": "자기소개",
+    "removeImage": "이미지 제거",
+    "imageSizeError": "이미지는 5MB 이하만 가능합니다",
+    "imageProcessError": "이미지 처리 실패: {{error}}",
+    "nicknameRequired": "닉네임을 입력해주세요",
+    "saveSuccess": "프로필이 저장되었습니다",
+    "saveFailed": "저장 실패: {{error}}",
+    "settingsQuick": "테마 · 알림 · 계정"
+  },
+  "header": {
+    "quickCreate": "빠른 생성",
+    "notifications": "알림"
+  },
+  "home": {
+    "feedTitle": "피드"
+  },
+  "portfolio": {
+    "title": "포트폴리오",
+    "totalValue": "총 자산 가치",
+    "dailyReturn": "일일 수익",
+    "returnHistory": "7일 수익률 추이",
+    "allocation": "자산 배분",
+    "holdings": "보유 자산",
+    "noHoldings": "보유 자산이 없습니다",
+    "symbol": "심볼 선택",
+    "quantity": "수량",
+    "avgPrice": "평단가",
+    "fieldsRequired": "모든 필드를 입력해주세요",
+    "addSuccess": "{{symbol}}을(를) 추가했습니다",
+    "addFailed": "추가 실패: {{error}}",
+    "deleteSuccess": "{{symbol}}을(를) 삭제했습니다",
+    "deleteFailed": "삭제 실패: {{error}}"
+  }
+}
