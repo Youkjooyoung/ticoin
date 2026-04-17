@@ -9,6 +9,29 @@ spring:
     name: ticoin-backend
   profiles:
     active: ${SPRING_PROFILES_ACTIVE:local}
+  security:
+    oauth2:
+      client:
+        registration:
+          google:
+            client-id: ${GOOGLE_CLIENT_ID:disabled}
+            client-secret: ${GOOGLE_CLIENT_SECRET:disabled}
+            scope: openid,profile,email
+            redirect-uri: "{baseUrl}/login/oauth2/code/{registrationId}"
+          kakao:
+            client-id: ${KAKAO_CLIENT_ID:disabled}
+            client-secret: ${KAKAO_CLIENT_SECRET:disabled}
+            client-authentication-method: client_secret_post
+            authorization-grant-type: authorization_code
+            redirect-uri: "{baseUrl}/login/oauth2/code/{registrationId}"
+            scope: profile_nickname,profile_image,account_email
+            client-name: Kakao
+        provider:
+          kakao:
+            authorization-uri: https://kauth.kakao.com/oauth/authorize
+            token-uri: https://kauth.kakao.com/oauth/token
+            user-info-uri: https://kapi.kakao.com/v2/user/me
+            user-name-attribute: id
   datasource:
     url: jdbc:postgresql://${DB_HOST:localhost}:${DB_PORT:5432}/${DB_NAME:ticoin}
     username: ${DB_USER:ticoin}
@@ -69,6 +92,12 @@ springdoc:
     tags-sorter: alpha
 
 ticoin:
+  auth:
+    jwt:
+      secret: ${TICOIN_JWT_SECRET:change-me-in-production-ticoin-secret-key-please-use-env-var-32b}
+      ttl: ${TICOIN_JWT_TTL:P7D}
+      issuer: ticoin
+    redirect-url: ${TICOIN_AUTH_REDIRECT:http://localhost:5174/auth/callback}
   cors:
     allowed-origins: ${TICOIN_CORS_ORIGINS:http://localhost:5173,http://localhost:5174,http://localhost:3000}
   websocket:
@@ -85,6 +114,14 @@ ticoin:
     coinmarketcap:
       base-url: ${CMC_URL:https://pro-api.coinmarketcap.com/v1}
       api-key: ${CMC_API_KEY:}
+    reddit:
+      base-url: ${REDDIT_URL:https://www.reddit.com}
+    google-news:
+      base-url: ${GOOGLE_NEWS_URL:https://news.google.com}
+    anthropic:
+      base-url: ${ANTHROPIC_URL:https://api.anthropic.com}
+      api-key: ${ANTHROPIC_API_KEY:}
+      model: ${ANTHROPIC_MODEL:claude-haiku-4-5-20251001}
 
 logging:
   level:
