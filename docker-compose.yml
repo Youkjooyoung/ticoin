@@ -8,7 +8,7 @@ services:
       POSTGRES_USER: ticoin
       POSTGRES_PASSWORD: ticoin
     ports:
-      - "5433:5432"
+      - "5434:5432"
     volumes:
       - ticoin-pgdata:/var/lib/postgresql/data
     healthcheck:
