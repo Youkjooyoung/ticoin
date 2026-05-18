@@ -1,7 +1,6 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useMarketStore } from '../stores/marketStore.js';
 import { useLivePrices } from '../hooks/useLivePrices.js';
-import { useBinanceTicker } from '../hooks/useBinanceTicker.js';
 import { useProfileStore } from '../stores/profileStore.js';
 import StoryBar from '../components/StoryBar.jsx';
 import AssetCard from '../components/AssetCard.jsx';
@@ -21,12 +20,6 @@ export default function Home() {
 
   useLivePrices();
 
-  const cryptoSymbols = useMemo(
-    () => feed.filter((a) => a.type === 'CRYPTO').map((a) => a.symbol),
-    [feed]
-  );
-  useBinanceTicker(cryptoSymbols);
-
   useEffect(() => { loadFeed(); loadProfile(); }, [loadFeed, loadProfile]);
 
   useEffect(() => {
@@ -38,51 +31,50 @@ export default function Home() {
   }, []);
 
   const onPosted = (created) => setPosts((list) => [created, ...list]);
-
   const topAsset = feed[0];
 
   return (
-    <div className="space-y-6">
-      <StoryBar items={feed} />
+    <div className="grid gap-6 xl:grid-cols-[1fr_360px]">
+      <div className="space-y-6 min-w-0">
+        <StoryBar items={feed} />
 
-      {topAsset && (
-        <AiAnalysisCard
-          symbol={topAsset.symbol}
-          price={topAsset.price}
-          changePct={topAsset.changePct}
-        />
-      )}
+        {loading && feed.length === 0 ? (
+          <div className="space-y-4">
+            {[1, 2, 3].map((i) => <AssetCardSkeleton key={i} />)}
+          </div>
+        ) : (
+          <div className="grid gap-4 lg:grid-cols-2">
+            {feed.map((asset) => (
+              <AssetCard key={asset.symbol} asset={asset} onOpen={setSelected} />
+            ))}
+          </div>
+        )}
+      </div>
 
-      <PostComposer onPosted={onPosted} />
+      <aside className="space-y-4">
+        {topAsset && (
+          <AiAnalysisCard
+            symbol={topAsset.symbol}
+            price={topAsset.price}
+            changePct={topAsset.changePercent24h}
+          />
+        )}
 
-      {loading && feed.length === 0 ? (
-        <div className="space-y-4">
-          {[1, 2, 3].map((i) => <AssetCardSkeleton key={i} />)}
-        </div>
-      ) : (
-        <div className="space-y-4">
-          {feed.slice(0, 3).map((a) => (
-            <AssetCard key={a.symbol} asset={a} onOpen={setSelected} />
-          ))}
-        </div>
-      )}
+        <PostComposer onPosted={onPosted} />
 
-      {posts.length > 0 && (
-        <section className="space-y-4">
-          <h3 className="text-sm font-bold text-text-3 uppercase tracking-wider px-1">커뮤니티 피드</h3>
-          {posts.map((p) => (
-            <FeedItem key={p.id} post={p} onUpdate={(u) => setPosts((list) => list.map((x) => x.id === u.id ? u : x))} />
+        <section className="space-y-3">
+          <h3 className="text-xs font-bold text-text-3 uppercase tracking-wider px-1">커뮤니티 피드</h3>
+          {postsLoading && <div className="glass-card p-4 text-sm text-text-3">게시글을 불러오는 중입니다.</div>}
+          {!postsLoading && posts.length === 0 && <div className="glass-card p-4 text-sm text-text-3">아직 게시글이 없습니다.</div>}
+          {posts.map((post) => (
+            <FeedItem
+              key={post.id}
+              post={post}
+              onUpdate={(updated) => setPosts((list) => list.map((item) => item.id === updated.id ? updated : item))}
+            />
           ))}
         </section>
-      )}
-
-      {feed.length > 3 && (
-        <div className="space-y-4">
-          {feed.slice(3).map((a) => (
-            <AssetCard key={a.symbol} asset={a} onOpen={setSelected} />
-          ))}
-        </div>
-      )}
+      </aside>
 
       {selected && <AssetDetailModal asset={selected} onClose={() => setSelected(null)} />}
     </div>

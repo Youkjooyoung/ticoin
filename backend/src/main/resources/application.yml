@@ -114,14 +114,17 @@ ticoin:
     coinmarketcap:
       base-url: ${CMC_URL:https://pro-api.coinmarketcap.com/v1}
       api-key: ${CMC_API_KEY:}
+    upbit:
+      base-url: ${UPBIT_URL:https://api.upbit.com}
+      websocket-url: ${UPBIT_WS_URL:wss://api.upbit.com/websocket/v1}
     reddit:
       base-url: ${REDDIT_URL:https://www.reddit.com}
     google-news:
       base-url: ${GOOGLE_NEWS_URL:https://news.google.com}
-    anthropic:
-      base-url: ${ANTHROPIC_URL:https://api.anthropic.com}
-      api-key: ${ANTHROPIC_API_KEY:}
-      model: ${ANTHROPIC_MODEL:claude-haiku-4-5-20251001}
+    openai:
+      base-url: ${OPENAI_URL:https://api.openai.com}
+      api-key: ${OPENAI_API_KEY:}
+      model: ${OPENAI_MODEL:gpt-5-mini}
 
 logging:
   level:

@@ -1,6 +1,7 @@
 package com.ticoin.service;
 
 import com.ticoin.client.CoinGeckoClient;
+import com.ticoin.client.UpbitClient;
 import com.ticoin.client.YahooFinanceClient;
 import com.ticoin.dto.AssetDto;
 import com.ticoin.dto.CandleDto;
@@ -14,24 +15,25 @@ import java.util.stream.Stream;
 @RequiredArgsConstructor
 public class MarketService {
 
+    private final UpbitClient upbit;
     private final CoinGeckoClient coinGecko;
     private final YahooFinanceClient yahoo;
 
-    private static final List<String> DEFAULT_COINS = List.of(
-            "bitcoin", "ethereum", "solana", "cardano", "ripple", "dogecoin"
+    private static final List<String> DEFAULT_KRW_MARKETS = List.of(
+            "KRW-BTC", "KRW-ETH", "KRW-XRP", "KRW-SOL", "KRW-ADA", "KRW-DOGE"
     );
     private static final List<String> DEFAULT_STOCKS = List.of(
             "AAPL", "TSLA", "NVDA", "MSFT", "GOOGL", "AMZN"
     );
 
     public List<AssetDto> getFeed() {
-        List<AssetDto> coins = coinGecko.fetchMarkets(DEFAULT_COINS);
+        List<AssetDto> coins = upbit.fetchTickers(DEFAULT_KRW_MARKETS);
         List<AssetDto> stocks = yahoo.fetchQuotes(DEFAULT_STOCKS);
         return Stream.concat(coins.stream(), stocks.stream()).toList();
     }
 
     public List<AssetDto> getCoins() {
-        return coinGecko.fetchMarkets(DEFAULT_COINS);
+        return upbit.fetchTickers(DEFAULT_KRW_MARKETS);
     }
 
     public List<AssetDto> getStocks() {
@@ -39,6 +41,10 @@ public class MarketService {
     }
 
     public List<AssetDto> getTrending() {
+        List<AssetDto> upbitTrending = upbit.fetchTopKrwTickers();
+        if (!upbitTrending.isEmpty()) {
+            return upbitTrending;
+        }
         return coinGecko.fetchTrending();
     }
 
@@ -48,21 +54,11 @@ public class MarketService {
             String yahooInterval = mapStockInterval(interval);
             return yahoo.fetchChart(symbol, range, yahooInterval);
         }
-        int days = mapCoinDays(interval);
-        return coinGecko.fetchOhlc(symbol.toLowerCase(), days);
+        return upbit.fetchCandles(symbol, interval);
     }
 
     public List<AssetDto> searchCoins(String query) {
-        return coinGecko.fetchMarkets(List.of(query.toLowerCase()));
-    }
-
-    private int mapCoinDays(String interval) {
-        return switch (interval == null ? "1D" : interval.toUpperCase()) {
-            case "15M", "1H" -> 1;
-            case "4H" -> 7;
-            case "1W" -> 30;
-            default -> 7;
-        };
+        return upbit.searchKrwMarkets(query);
     }
 
     private String mapStockRange(String interval) {

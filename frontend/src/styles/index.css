@@ -3,176 +3,145 @@
 @tailwind utilities;
 
 @layer base {
-  /* Light (sky blue) — default */
   :root {
-    --bg: 240 249 255;            /* sky-50 */
-    --bg-elev: 255 255 255;       /* white cards */
-    --bg-soft: 224 242 254;       /* sky-100 hover */
-    --surface-1: 255 255 255;     /* sidebar surface */
-    --surface-2: 224 242 254;     /* hover surface */
-    --border: 186 230 253;        /* sky-200 */
-    --border-strong: 125 211 252; /* sky-300 */
-
-    --brand: 139 92 246;          /* purple-500 */
-    --brand-dark: 124 58 237;     /* purple-600 */
-    --brand-light: 139 92 246;    /* purple-500 (light UI keeps saturation) */
-    --brand-soft: 237 233 254;    /* purple-100 */
-
-    --sky: 14 165 233;            /* sky-500 */
-    --sky-soft: 224 242 254;      /* sky-100 */
-
-    --accent-start: 56 189 248;   /* sky-400 */
-    --accent-end: 139 92 246;     /* purple-500 */
-
-    --up: 5 150 105;              /* emerald-600 (stronger on light) */
-    --down: 220 38 38;            /* red-600 */
-
-    --text-1: 15 23 42;           /* slate-900 */
-    --text-2: 71 85 105;          /* slate-600 */
-    --text-3: 100 116 139;        /* slate-500 */
-    --text-4: 148 163 184;        /* slate-400 */
-
+    --bg: 246 248 251;
+    --bg-elev: 255 255 255;
+    --bg-soft: 238 242 247;
+    --surface-1: 255 255 255;
+    --surface-2: 232 238 246;
+    --border: 213 221 232;
+    --border-strong: 147 161 181;
+    --brand: 0 122 255;
+    --brand-dark: 0 95 204;
+    --brand-light: 37 99 235;
+    --brand-soft: 219 234 254;
+    --sky: 14 165 233;
+    --sky-soft: 224 242 254;
+    --accent-start: 0 122 255;
+    --accent-end: 16 185 129;
+    --up: 220 38 38;
+    --down: 37 99 235;
+    --text-1: 15 23 42;
+    --text-2: 51 65 85;
+    --text-3: 100 116 139;
+    --text-4: 148 163 184;
     color-scheme: light;
   }
 
-  /* Dark */
   .dark {
-    --bg: 11 11 15;
-    --bg-elev: 19 19 26;
-    --bg-soft: 26 26 36;
-    --surface-1: 19 19 26;
-    --surface-2: 26 26 36;
-    --border: 35 35 46;
-    --border-strong: 45 45 58;
-
-    --brand: 139 92 246;
-    --brand-dark: 124 58 237;
-    --brand-light: 167 139 250;
-    --brand-soft: 30 27 58;
-
+    --bg: 8 11 18;
+    --bg-elev: 15 20 31;
+    --bg-soft: 22 29 43;
+    --surface-1: 12 17 27;
+    --surface-2: 24 32 47;
+    --border: 38 49 68;
+    --border-strong: 71 85 105;
+    --brand: 59 130 246;
+    --brand-dark: 37 99 235;
+    --brand-light: 96 165 250;
+    --brand-soft: 23 37 84;
     --sky: 56 189 248;
-    --sky-soft: 30 58 138;
-
-    --accent-start: 167 139 250;
-    --accent-end: 139 92 246;
-
-    --up: 16 185 129;
-    --down: 239 68 68;
-
-    --text-1: 245 245 247;
-    --text-2: 161 161 170;
-    --text-3: 113 113 122;
-    --text-4: 82 82 91;
-
+    --sky-soft: 12 74 110;
+    --accent-start: 59 130 246;
+    --accent-end: 16 185 129;
+    --up: 248 113 113;
+    --down: 96 165 250;
+    --text-1: 248 250 252;
+    --text-2: 203 213 225;
+    --text-3: 148 163 184;
+    --text-4: 100 116 139;
     color-scheme: dark;
   }
 
-  html, body, #root { height: 100%; }
+  html, body, #root {
+    height: 100%;
+  }
 
   body {
     @apply bg-bg text-text-1;
     font-family: 'Inter', 'Pretendard', system-ui, sans-serif;
     -webkit-font-smoothing: antialiased;
     text-rendering: optimizeLegibility;
-    background-image: radial-gradient(
-        circle at 20% 10%,
-        rgb(var(--accent-start) / 0.08) 0%,
-        transparent 50%
-      ),
-      radial-gradient(
-        circle at 80% 90%,
-        rgb(var(--accent-end) / 0.08) 0%,
-        transparent 50%
-      );
+    background-image:
+      linear-gradient(180deg, rgb(var(--bg)) 0%, rgb(var(--bg-soft) / 0.55) 100%),
+      radial-gradient(circle at 12% 0%, rgb(var(--brand) / 0.12) 0%, transparent 36%),
+      radial-gradient(circle at 88% 8%, rgb(var(--accent-end) / 0.10) 0%, transparent 34%);
     background-attachment: fixed;
-    transition: background-color 0.25s ease, color 0.25s ease;
-  }
-
-  ::-webkit-scrollbar { width: 8px; height: 8px; }
-  ::-webkit-scrollbar-track { background: transparent; }
-  ::-webkit-scrollbar-thumb {
-    background: rgb(var(--border-strong));
-    border-radius: 10px;
-  }
-  ::-webkit-scrollbar-thumb:hover {
-    background: rgb(var(--text-3));
   }
 
   * {
     border-color: rgb(var(--border));
   }
+
+  ::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background: rgb(var(--border-strong));
+    border-radius: 8px;
+  }
 }
 
 @layer components {
   .glass-card {
-    background: rgb(var(--bg-elev) / 0.92);
+    background: rgb(var(--bg-elev) / 0.94);
     border: 1px solid rgb(var(--border));
-    border-radius: 1rem;
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
-    box-shadow: 0 1px 2px rgb(15 23 42 / 0.04), 0 4px 16px rgb(15 23 42 / 0.06);
+    border-radius: 8px;
+    box-shadow: 0 8px 28px rgb(15 23 42 / 0.08);
   }
 
   .dark .glass-card {
-    background: rgb(var(--bg-elev) / 0.7);
-    box-shadow: 0 1px 2px rgb(0 0 0 / 0.2), 0 4px 16px rgb(0 0 0 / 0.25);
+    background: rgb(var(--bg-elev) / 0.86);
+    box-shadow: 0 10px 34px rgb(0 0 0 / 0.28);
   }
 
-  .mono { font-family: 'JetBrains Mono', 'SF Mono', monospace; }
+  .mono {
+    font-family: 'JetBrains Mono', 'SF Mono', monospace;
+  }
 
   .gradient-text {
     @apply bg-clip-text text-transparent;
-    background-image: linear-gradient(
-      135deg,
-      rgb(var(--accent-start)) 0%,
-      rgb(var(--accent-end)) 100%
-    );
+    background-image: linear-gradient(135deg, rgb(var(--accent-start)) 0%, rgb(var(--accent-end)) 100%);
   }
 
   .gradient-brand-bg {
-    background-image: linear-gradient(
-      135deg,
-      rgb(var(--accent-start)) 0%,
-      rgb(var(--accent-end)) 100%
-    );
+    background-image: linear-gradient(135deg, rgb(var(--accent-start)) 0%, rgb(var(--accent-end)) 100%);
   }
 
   .chip {
     @apply inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-semibold;
     background: rgb(var(--brand-soft));
-    color: rgb(var(--brand));
-  }
-
-  .card-hover {
-    transition: border-color 0.2s ease, transform 0.2s ease;
-  }
-  .card-hover:hover {
-    border-color: rgb(var(--border-strong));
+    color: rgb(var(--brand-light));
   }
 }
 
 @layer utilities {
-  .no-scrollbar::-webkit-scrollbar { display: none; }
-  .no-scrollbar { scrollbar-width: none; }
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+
+  .no-scrollbar {
+    scrollbar-width: none;
+  }
 }
 
-@keyframes slideIn {
-  from { opacity: 0; transform: translateX(20px); }
-  to   { opacity: 1; transform: translateX(0); }
-}
 @keyframes fadeIn {
   from { opacity: 0; }
-  to   { opacity: 1; }
+  to { opacity: 1; }
 }
+
 @keyframes scaleIn {
   from { opacity: 0; transform: scale(0.96); }
-  to   { opacity: 1; transform: scale(1); }
+  to { opacity: 1; transform: scale(1); }
 }
-@keyframes shimmer {
-  0% { background-position: -200% 0; }
-  100% { background-position: 200% 0; }
-}
+
 @keyframes slideUp {
   from { opacity: 0; transform: translateY(12px); }
-  to   { opacity: 1; transform: translateY(0); }
+  to { opacity: 1; transform: translateY(0); }
 }

@@ -33,6 +33,8 @@ services:
       DB_PASSWORD: ticoin
       TICOIN_CORS_ORIGINS: "http://localhost:5174,http://localhost:3000"
       CMC_API_KEY: ${CMC_API_KEY:-}
+      OPENAI_API_KEY: ${OPENAI_API_KEY:-}
+      OPENAI_MODEL: ${OPENAI_MODEL:-gpt-5-mini}
     ports:
       - "8090:8090"
     healthcheck:

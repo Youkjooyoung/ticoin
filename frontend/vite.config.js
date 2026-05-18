@@ -10,11 +10,11 @@ export default defineConfig({
       registerType: 'autoUpdate',
       includeAssets: ['favicon.ico'],
       manifest: {
-        name: 'ticoin — 내 자산을 한번에',
+        name: 'ticoin 업비트 투자 대시보드',
         short_name: 'ticoin',
-        description: '주식과 코인을 한 곳에서 추적하는 실시간 대시보드',
-        theme_color: '#8B5CF6',
-        background_color: '#F0F9FF',
+        description: '업비트 KRW 마켓 기반 실시간 가상자산·주식 소셜 대시보드',
+        theme_color: '#007AFF',
+        background_color: '#080B12',
         display: 'standalone',
         start_url: '/',
         scope: '/',
@@ -37,14 +37,6 @@ export default defineConfig({
       workbox: {
         navigateFallbackDenylist: [/^\/api/, /^\/ws/, /^\/oauth2/, /^\/login/],
         runtimeCaching: [
-          {
-            urlPattern: /^https:\/\/fonts\.(?:gstatic|googleapis)\.com\/.*/i,
-            handler: 'CacheFirst',
-            options: {
-              cacheName: 'google-fonts',
-              expiration: { maxEntries: 20, maxAgeSeconds: 60 * 60 * 24 * 365 },
-            },
-          },
           {
             urlPattern: /\/api\/market\/feed/,
             handler: 'NetworkFirst',

@@ -34,35 +34,28 @@ export default function Login() {
         </div>
 
         <div className="space-y-2 pt-2">
-          {providers.map((p) => {
-            const style = PROVIDER_STYLES[p.id] || { className: 'bg-brand text-white', icon: <LogIn className="w-5 h-5" /> };
+          {providers.map((provider) => {
+            const style = PROVIDER_STYLES[provider.id] || { className: 'bg-brand text-white', icon: <LogIn className="w-5 h-5" /> };
             return (
               <button
-                key={p.id}
-                disabled={!p.enabled}
-                onClick={() => loginWith(p.loginUrl)}
-                className={cn(
-                  'w-full h-12 rounded-xl border flex items-center justify-center gap-3 font-semibold transition-all',
-                  style.className,
-                  !p.enabled && 'opacity-50 cursor-not-allowed'
-                )}
+                key={provider.id}
+                disabled={!provider.enabled}
+                onClick={() => loginWith(provider.loginUrl)}
+                className={cn('w-full h-12 rounded-lg border flex items-center justify-center gap-3 font-semibold transition-all', style.className, !provider.enabled && 'opacity-60 cursor-not-allowed')}
               >
                 {style.icon}
-                <span>{p.label}{!p.enabled && ' (비활성)'}</span>
+                <span>{provider.label}{!provider.enabled && ' (설정 필요)'}</span>
               </button>
             );
           })}
         </div>
 
-        <div className="pt-4 border-t border-[var(--border)]">
+        <div className="pt-4 border-t border-border">
           <p className="text-xs text-text-3 flex items-center justify-center gap-1.5 mb-3">
-            <Shield className="w-3 h-3" /> 로그인 없이도 사용 가능합니다
+            <Shield className="w-3 h-3" /> 로그인하지 않아도 게스트 모드로 사용할 수 있습니다.
           </p>
-          <Link
-            to="/"
-            className="inline-block text-sm text-brand-light font-semibold hover:underline"
-          >
-            게스트로 계속하기 →
+          <Link to="/" className="inline-block text-sm text-brand-light font-semibold hover:underline">
+            대시보드로 돌아가기
           </Link>
         </div>
       </div>

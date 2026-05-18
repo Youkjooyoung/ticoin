@@ -1,6 +1,6 @@
 import { ChevronDown } from 'lucide-react';
 import { useMarketStore } from '../stores/marketStore.js';
-import { cn, fmtPrice } from '../lib/utils.js';
+import { cn, displaySymbol, fmtMoney } from '../lib/utils.js';
 
 export default function SymbolSelect({ value, onChange, className, placeholder = '심볼을 선택하세요' }) {
   const feed = useMarketStore((s) => s.feed);
@@ -10,12 +10,12 @@ export default function SymbolSelect({ value, onChange, className, placeholder =
       <select
         value={value || ''}
         onChange={(e) => onChange(e.target.value)}
-        className="w-full appearance-none h-9 pl-3 pr-9 rounded-md bg-bg-soft border border-border text-xs outline-none focus:border-brand cursor-pointer hover:border-border-strong transition-colors"
+        className="w-full appearance-none h-10 pl-3 pr-9 rounded-lg bg-bg-soft border border-border text-xs outline-none focus:border-brand cursor-pointer hover:border-border-strong transition-colors"
       >
         <option value="" disabled>{placeholder}</option>
-        {feed.map((a) => (
-          <option key={a.symbol} value={a.symbol}>
-            {a.symbol} · {a.name} (${fmtPrice(a.price, a.price < 10 ? 4 : 2)})
+        {feed.map((asset) => (
+          <option key={asset.symbol} value={asset.symbol}>
+            {displaySymbol(asset.symbol)} · {asset.name} · {fmtMoney(asset.price, asset.type, asset.symbol)}
           </option>
         ))}
       </select>

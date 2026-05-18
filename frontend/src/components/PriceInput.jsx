@@ -32,10 +32,7 @@ export default function PriceInput({
       onChange={handleChange}
       placeholder={placeholder}
       disabled={disabled}
-      className={cn(
-        'h-9 px-3 rounded-md bg-bg-soft border border-border text-xs outline-none focus:border-brand disabled:opacity-50',
-        className
-      )}
+      className={cn('h-10 px-3 rounded-lg bg-bg-soft border border-border text-xs outline-none focus:border-brand disabled:opacity-50', className)}
     />
   );
 }

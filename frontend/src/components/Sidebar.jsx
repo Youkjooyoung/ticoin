@@ -16,10 +16,10 @@ const NAV = [
 export default function Sidebar() {
   const { t } = useTranslation();
   return (
-    <aside className="hidden md:flex fixed inset-y-0 left-0 w-60 flex-col border-r border-[var(--border)] bg-[var(--surface-1)] backdrop-blur-lg z-30">
+    <aside className="hidden md:flex fixed inset-y-0 left-0 w-64 flex-col border-r border-border bg-surface-1/95 backdrop-blur z-30">
       <NavLink to="/" end className="block px-6 pt-8 pb-6 hover:opacity-90 transition-opacity">
         <h1 className="text-2xl font-extrabold gradient-text">{t('app.name')}</h1>
-        <p className="text-xs text-text-3 mt-1">{t('app.tagline')}</p>
+        <p className="text-xs text-text-3 mt-1 leading-relaxed">{t('app.tagline')}</p>
       </NavLink>
       <nav className="flex-1 px-3 space-y-1">
         {NAV.map(({ to, key, icon: Icon }) => (
@@ -29,7 +29,7 @@ export default function Sidebar() {
             end={to === '/'}
             className={({ isActive }) =>
               cn(
-                'group flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm transition-colors',
+                'group flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm transition-colors',
                 isActive
                   ? 'bg-brand-soft text-brand-light font-semibold'
                   : 'text-text-2 hover:bg-bg-soft hover:text-text-1'
@@ -51,7 +51,7 @@ export default function Sidebar() {
           to="/settings"
           className={({ isActive }) =>
             cn(
-              'w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm transition-colors',
+              'w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm transition-colors',
               isActive
                 ? 'bg-brand-soft text-brand-light font-semibold'
                 : 'text-text-2 hover:bg-bg-soft hover:text-text-1'

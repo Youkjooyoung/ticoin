@@ -13,6 +13,28 @@ export function fmtPrice(n, digits = 2) {
   });
 }
 
+export function fmtMoney(value, type = 'CRYPTO', symbol = '') {
+  if (value == null || isNaN(value)) return '-';
+  if (type === 'CRYPTO' && symbol.startsWith('KRW-')) {
+    return `₩${Number(value).toLocaleString('ko-KR', { maximumFractionDigits: 0 })}`;
+  }
+  return `$${fmtPrice(value, Number(value) < 10 ? 4 : 2)}`;
+}
+
+export function fmtVolume(value, type = 'CRYPTO', symbol = '') {
+  if (value == null || isNaN(value)) return '-';
+  if (type === 'CRYPTO' && symbol.startsWith('KRW-')) {
+    return `₩${fmtCompact(value)}`;
+  }
+  return `$${fmtCompact(value)}`;
+}
+
+export function displaySymbol(symbol) {
+  if (!symbol) return '';
+  if (symbol.startsWith('KRW-')) return `${symbol.replace('KRW-', '')}/KRW`;
+  return symbol;
+}
+
 export function fmtCompact(n) {
   if (n == null || isNaN(n)) return '-';
   const abs = Math.abs(n);

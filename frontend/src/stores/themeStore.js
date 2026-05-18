@@ -22,12 +22,13 @@ function applyTheme(mode) {
   root.style.colorScheme = isDark ? 'dark' : 'light';
 }
 
+applyTheme(readStored());
+
 export const useThemeStore = create((set, get) => ({
   mode: readStored(),
   hydrated: false,
 
   hydrate: () => {
-    if (get().hydrated) return;
     const mode = readStored();
     applyTheme(mode);
     set({ mode, hydrated: true });

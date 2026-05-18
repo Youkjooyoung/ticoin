@@ -1,8 +1,8 @@
 {
   "app": {
     "name": "ticoin",
-    "tagline": "All your assets in one place",
-    "version": "ticoin v0.6.0 · All your assets in one place"
+    "tagline": "Real-time Upbit-first investment dashboard",
+    "version": "ticoin v0.6.0 · Upbit KRW market"
   },
   "nav": {
     "home": "Home",
@@ -22,7 +22,7 @@
     "edit": "Edit",
     "add": "Add",
     "close": "Close",
-    "loading": "Loading…",
+    "loading": "Loading...",
     "error": "Error",
     "success": "Success",
     "remove": "Remove",
@@ -30,7 +30,7 @@
   },
   "settings": {
     "title": "Settings",
-    "subtitle": "Tailor the app to your preferences",
+    "subtitle": "Manage theme, language, alerts, and account preferences.",
     "section": {
       "theme": "Theme",
       "language": "Language",
@@ -41,21 +41,21 @@
       "light": "Light",
       "dark": "Dark",
       "system": "System",
-      "switched": "Switched to {{mode}} mode"
+      "switched": "Switched to {{mode}} mode."
     },
     "language": {
       "label": "Language",
-      "changed": "Language changed to {{label}}"
+      "changed": "Language changed to {{label}}."
     },
     "menu": {
       "priceAlerts": "Price alerts",
       "priceAlertsDesc": "Enabled",
       "privacy": "Privacy & security",
       "privacyDesc": "Public profile",
-      "helpCenter": "Help & support",
+      "helpCenter": "Help center",
       "appVersion": "App version",
       "logout": "Log out",
-      "logoutConfirm": "Log out? Your local data stays on this device."
+      "logoutConfirm": "Log out? Local data stays on this device."
     }
   },
   "profile": {
@@ -70,25 +70,25 @@
     "cryptoNews": "Latest crypto news",
     "newsSource": "Google News · CryptoCompare",
     "newsError": "Could not load news. Check backend or external APIs.",
-    "defaultBio": "Stock & crypto investor",
+    "defaultBio": "Stock and crypto investor",
     "defaultNickname": "guest",
     "edit": "Edit profile",
     "nickname": "Nickname",
     "bio": "Bio",
     "removeImage": "Remove image",
-    "imageSizeError": "Image must be 5MB or smaller",
+    "imageSizeError": "Image must be 5MB or smaller.",
     "imageProcessError": "Image processing failed: {{error}}",
-    "nicknameRequired": "Please enter a nickname",
-    "saveSuccess": "Profile saved",
+    "nicknameRequired": "Please enter a nickname.",
+    "saveSuccess": "Profile saved.",
     "saveFailed": "Save failed: {{error}}",
-    "settingsQuick": "Theme · Notifications · Account"
+    "settingsQuick": "Theme · Alerts · Account"
   },
   "header": {
     "quickCreate": "Quick create",
     "notifications": "Notifications"
   },
   "home": {
-    "feedTitle": "Feed"
+    "feedTitle": "Live feed"
   },
   "portfolio": {
     "title": "Portfolio",
@@ -97,14 +97,14 @@
     "returnHistory": "7-day return trend",
     "allocation": "Asset allocation",
     "holdings": "Holdings",
-    "noHoldings": "No holdings yet",
+    "noHoldings": "No holdings yet.",
     "symbol": "Select symbol",
     "quantity": "Quantity",
     "avgPrice": "Avg. price",
-    "fieldsRequired": "Please fill in all fields",
-    "addSuccess": "Added {{symbol}}",
+    "fieldsRequired": "Please fill in all fields.",
+    "addSuccess": "Added {{symbol}}.",
     "addFailed": "Add failed: {{error}}",
-    "deleteSuccess": "Deleted {{symbol}}",
+    "deleteSuccess": "Deleted {{symbol}}.",
     "deleteFailed": "Delete failed: {{error}}"
   }
 }
