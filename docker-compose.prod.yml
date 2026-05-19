@@ -43,8 +43,6 @@ services:
       OPENAI_API_KEY: ${OPENAI_API_KEY:-}
       OPENAI_MODEL: ${OPENAI_MODEL:-gpt-5-mini}
       OPENAI_URL: ${OPENAI_URL:-https://api.openai.com}
-      UPBIT_URL: ${UPBIT_URL:-https://api.upbit.com}
-      UPBIT_WS_URL: ${UPBIT_WS_URL:-wss://api.upbit.com/websocket/v1}
       JAVA_TOOL_OPTIONS: "-XX:+UseContainerSupport -XX:MaxRAMPercentage=75.0 -Djava.security.egd=file:/dev/./urandom"
     expose:
       - "8090"

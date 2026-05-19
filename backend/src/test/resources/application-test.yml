@@ -30,9 +30,6 @@ ticoin:
     coinmarketcap:
       base-url: http://localhost:1
       api-key: ""
-    upbit:
-      base-url: http://localhost:1
-      websocket-url: ws://localhost:1
     openai:
       base-url: http://localhost:1
       api-key: ""

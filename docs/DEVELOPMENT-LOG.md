@@ -2,12 +2,12 @@
 
 ## 2026-05-18
 
-- Rebased project operating instructions around Codex in `AGENTS.md`.
-- Removed previous assistant-tooling files and references.
-- Migrated AI analysis from the previous provider-specific client to OpenAI Responses API.
-- Added Upbit-first market data integration for KRW crypto markets.
-- Restored corrupted Korean UI text and rebuilt core dashboard surfaces.
-- Updated documentation for current ports, data sources, and environment variables.
+- Read `AGENTS.md`, architecture/development docs, and the full-stack product ops skill before making changes.
+- Corrected the market-source direction: Ticoin uses Binance live crypto streams.
+- Removed the mistaken exchange-specific client and test.
+- Restored Binance ticker and kline hooks.
+- Updated the dashboard cards and detail modal so crypto prices and candles update in real time.
+- Rewrote project docs around Binance live data, CoinGecko seed data, Yahoo stocks, and OpenAI analysis.
 
 ## Validation Checklist
 

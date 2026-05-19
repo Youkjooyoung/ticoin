@@ -1,8 +1,8 @@
 {
   "app": {
     "name": "ticoin",
-    "tagline": "Real-time Upbit-first investment dashboard",
-    "version": "ticoin v0.6.0 · Upbit KRW market"
+    "tagline": "Binance live crypto and Yahoo stock dashboard",
+    "version": "ticoin v0.6.0 · Binance live market"
   },
   "nav": {
     "home": "Home",

@@ -11,8 +11,8 @@ test.describe('ticoin smoke', () => {
   test('home page loads trading shell', async ({ page }) => {
     await page.goto('/');
     await expect(page.locator('h1', { hasText: 'ticoin' })).toBeVisible();
-    await expect(page.getByText('업비트 기반 실시간 투자 대시보드')).toBeVisible();
-    await expect(page.getByText('커뮤니티 피드')).toBeVisible();
+    await expect(page.getByText('Binance live crypto')).toBeVisible();
+    await expect(page.getByText('트레이더 피드')).toBeVisible();
   });
 
   test('settings page shows theme and language controls', async ({ page }) => {

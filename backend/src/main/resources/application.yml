@@ -114,9 +114,6 @@ ticoin:
     coinmarketcap:
       base-url: ${CMC_URL:https://pro-api.coinmarketcap.com/v1}
       api-key: ${CMC_API_KEY:}
-    upbit:
-      base-url: ${UPBIT_URL:https://api.upbit.com}
-      websocket-url: ${UPBIT_WS_URL:wss://api.upbit.com/websocket/v1}
     reddit:
       base-url: ${REDDIT_URL:https://www.reddit.com}
     google-news:

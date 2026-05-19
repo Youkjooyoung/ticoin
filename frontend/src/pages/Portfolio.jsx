@@ -83,9 +83,9 @@ export default function Portfolio() {
     <div className="space-y-6">
       <section className="glass-card p-6">
         <p className="text-xs text-text-3 mb-1">총 자산 가치</p>
-        <h3 className="text-3xl font-extrabold mono">{fmtMoney(totalValue, selectedAsset?.type || 'CRYPTO', selectedAsset?.symbol || 'KRW-BTC')}</h3>
+        <h3 className="text-3xl font-extrabold mono">{fmtMoney(totalValue, selectedAsset?.type || 'CRYPTO', selectedAsset?.symbol || 'BTC')}</h3>
         <p className={cn('mt-1 text-sm font-semibold mono', changeClass(totalPnl))}>
-          {totalPnl >= 0 ? '+' : ''}{fmtMoney(Math.abs(totalPnl), selectedAsset?.type || 'CRYPTO', selectedAsset?.symbol || 'KRW-BTC')} ({fmtPct(totalPnlPct)})
+          {totalPnl >= 0 ? '+' : ''}{fmtMoney(Math.abs(totalPnl), selectedAsset?.type || 'CRYPTO', selectedAsset?.symbol || 'BTC')} ({fmtPct(totalPnlPct)})
         </p>
       </section>
 

@@ -20,7 +20,7 @@ export function useMarketKlines(symbol, interval, limit = 100, type = 'CRYPTO') 
       })
       .catch((err) => {
         if (cancelled) return;
-        setError(err?.message ?? '캔들 데이터를 불러오지 못했습니다.');
+        setError(err?.message ?? '차트 데이터를 불러오지 못했습니다.');
         setLoading(false);
       });
 

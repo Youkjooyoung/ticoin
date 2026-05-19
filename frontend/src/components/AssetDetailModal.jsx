@@ -1,9 +1,11 @@
 import { useEffect, useMemo, useState } from 'react';
 import { Plus, Star, TrendingDown, TrendingUp, X } from 'lucide-react';
 import CandleChart from './charts/CandleChart.jsx';
-import { marketApi, portfolioApi, watchlistApi } from '../api/market.js';
+import { portfolioApi, watchlistApi } from '../api/market.js';
+import { useBinanceKlines } from '../hooks/useBinanceKlines.js';
+import { useMarketKlines } from '../hooks/useMarketKlines.js';
 import { useToastStore } from '../stores/toastStore.js';
-import { changeClass, cn, displaySymbol, fmtMoney, fmtPct, fmtPrice, fmtVolume } from '../lib/utils.js';
+import { changeClass, cn, displaySymbol, fmtMoney, fmtPct, fmtPrice, fmtVolume, pairSymbol } from '../lib/utils.js';
 
 const INTERVALS = ['15M', '1H', '4H', '1D', '1W'];
 
@@ -22,27 +24,18 @@ function generateFallbackCandles(seed = 100, length = 60) {
 
 export default function AssetDetailModal({ asset, onClose }) {
   const [interval, setInterval] = useState('1H');
-  const [candles, setCandles] = useState([]);
   const [closing, setClosing] = useState(false);
   const toast = useToastStore();
-
+  const isCrypto = asset?.type === 'CRYPTO';
+  const binance = useBinanceKlines(isCrypto ? asset?.symbol : null, interval, 140);
+  const market = useMarketKlines(asset?.symbol, interval, 140, asset?.type);
+  const sourceCandles = isCrypto ? binance.candles : market.candles;
   const fallback = useMemo(() => generateFallbackCandles(asset?.price || 100), [asset?.price]);
+  const candles = sourceCandles.length > 0 ? sourceCandles : fallback;
 
   useEffect(() => {
-    if (!asset) return;
-    let ignore = false;
-    marketApi.candles(asset.symbol, asset.type, interval)
-      .then((data) => {
-        if (ignore) return;
-        setCandles(Array.isArray(data) && data.length > 3 ? data : fallback);
-      })
-      .catch(() => setCandles(fallback));
-    return () => { ignore = true; };
-  }, [asset, interval, fallback]);
-
-  useEffect(() => {
-    const onKey = (e) => {
-      if (e.key === 'Escape') handleClose();
+    const onKey = (event) => {
+      if (event.key === 'Escape') handleClose();
     };
     window.addEventListener('keydown', onKey);
     return () => window.removeEventListener('keydown', onKey);
@@ -56,7 +49,7 @@ export default function AssetDetailModal({ asset, onClose }) {
   const addToWatchlist = async () => {
     try {
       await watchlistApi.create({ symbol: asset.symbol, name: asset.name, type: asset.type, alertEnabled: true });
-      toast.success(`${displaySymbol(asset.symbol)}을 관심목록에 추가했습니다.`);
+      toast.success(`${displaySymbol(asset.symbol)} 관심목록에 추가했습니다.`);
     } catch {
       toast.error('관심목록 추가에 실패했습니다.');
     }
@@ -69,7 +62,7 @@ export default function AssetDetailModal({ asset, onClose }) {
     if (!avgPrice) return;
     try {
       await portfolioApi.create({ symbol: asset.symbol, name: asset.name, type: asset.type, quantity: Number(quantity), avgPrice: Number(avgPrice) });
-      toast.success(`${displaySymbol(asset.symbol)}을 포트폴리오에 추가했습니다.`);
+      toast.success(`${displaySymbol(asset.symbol)} 포트폴리오에 추가했습니다.`);
     } catch {
       toast.error('포트폴리오 추가에 실패했습니다.');
     }
@@ -90,7 +83,7 @@ export default function AssetDetailModal({ asset, onClose }) {
             </div>
             <div className="min-w-0">
               <h3 className="text-xl font-extrabold truncate">{asset.name}</h3>
-              <p className="text-xs text-text-3 mono">{displaySymbol(asset.symbol)} · {asset.type}</p>
+              <p className="text-xs text-text-3 mono">{pairSymbol(asset.symbol, asset.type)} · {isCrypto ? 'Binance live' : 'Yahoo'}</p>
             </div>
           </div>
           <button onClick={handleClose} className="w-9 h-9 rounded-lg bg-bg-soft border border-border flex items-center justify-center hover:bg-bg-elev transition-colors" aria-label="닫기">
@@ -101,10 +94,10 @@ export default function AssetDetailModal({ asset, onClose }) {
         <div className="flex-1 overflow-y-auto p-5 space-y-5">
           <div className="flex items-end justify-between flex-wrap gap-3">
             <div>
-              <p className="text-3xl font-extrabold mono">{fmtMoney(asset.price, asset.type, asset.symbol)}</p>
+              <p className="text-3xl font-extrabold mono">{fmtMoney(asset.price, asset.type)}</p>
               <p className={cn('text-sm font-semibold mono flex items-center gap-1 mt-1', changeClass(asset.changePercent24h))}>
                 {up ? <TrendingUp className="w-4 h-4" /> : <TrendingDown className="w-4 h-4" />}
-                {asset.change24h >= 0 ? '+' : ''}{fmtMoney(Math.abs(asset.change24h || 0), asset.type, asset.symbol)} · {fmtPct(asset.changePercent24h)}
+                {asset.change24h >= 0 ? '+' : ''}{fmtMoney(Math.abs(asset.change24h || 0), asset.type)} · {fmtPct(asset.changePercent24h)}
               </p>
             </div>
             <div className="flex gap-2">
@@ -128,10 +121,10 @@ export default function AssetDetailModal({ asset, onClose }) {
           <CandleChart data={candles} height={380} />
 
           <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-            <StatBox label="24H 고가" value={fmtMoney(asset.high24h, asset.type, asset.symbol)} color="text-up" />
-            <StatBox label="24H 저가" value={fmtMoney(asset.low24h, asset.type, asset.symbol)} color="text-down" />
-            <StatBox label="시가총액" value={asset.marketCap ? fmtVolume(asset.marketCap, asset.type, asset.symbol) : '-'} />
-            <StatBox label="거래대금" value={fmtVolume(asset.volume24h, asset.type, asset.symbol)} />
+            <StatBox label="24H 고가" value={fmtMoney(asset.high24h, asset.type)} color="text-up" />
+            <StatBox label="24H 저가" value={fmtMoney(asset.low24h, asset.type)} color="text-down" />
+            <StatBox label="시가총액" value={asset.marketCap ? fmtVolume(asset.marketCap, asset.type) : '-'} />
+            <StatBox label="거래대금" value={fmtVolume(asset.volume24h, asset.type)} />
           </div>
 
           <div className="grid grid-cols-4 gap-3 text-xs mono pt-3 border-t border-border">

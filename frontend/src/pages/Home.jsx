@@ -1,6 +1,7 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useMarketStore } from '../stores/marketStore.js';
 import { useLivePrices } from '../hooks/useLivePrices.js';
+import { useBinanceTicker } from '../hooks/useBinanceTicker.js';
 import { useProfileStore } from '../stores/profileStore.js';
 import StoryBar from '../components/StoryBar.jsx';
 import AssetCard from '../components/AssetCard.jsx';
@@ -20,6 +21,12 @@ export default function Home() {
 
   useLivePrices();
 
+  const cryptoSymbols = useMemo(
+    () => feed.filter((asset) => asset.type === 'CRYPTO').map((asset) => asset.symbol),
+    [feed]
+  );
+  useBinanceTicker(cryptoSymbols);
+
   useEffect(() => { loadFeed(); loadProfile(); }, [loadFeed, loadProfile]);
 
   useEffect(() => {
@@ -31,7 +38,7 @@ export default function Home() {
   }, []);
 
   const onPosted = (created) => setPosts((list) => [created, ...list]);
-  const topAsset = feed[0];
+  const topAsset = feed.find((asset) => asset.type === 'CRYPTO') || feed[0];
 
   return (
     <div className="grid gap-6 xl:grid-cols-[1fr_360px]">
@@ -63,7 +70,7 @@ export default function Home() {
         <PostComposer onPosted={onPosted} />
 
         <section className="space-y-3">
-          <h3 className="text-xs font-bold text-text-3 uppercase tracking-wider px-1">커뮤니티 피드</h3>
+          <h3 className="text-xs font-bold text-text-3 uppercase tracking-wider px-1">트레이더 피드</h3>
           {postsLoading && <div className="glass-card p-4 text-sm text-text-3">게시글을 불러오는 중입니다.</div>}
           {!postsLoading && posts.length === 0 && <div className="glass-card p-4 text-sm text-text-3">아직 게시글이 없습니다.</div>}
           {posts.map((post) => (

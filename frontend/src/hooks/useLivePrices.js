@@ -36,9 +36,7 @@ export function useLivePrices() {
           try {
             const evt = JSON.parse(msg.body);
             pushTriggered(evt);
-            toastSuccess(
-              `${evt.symbol} 알림 도달! ${evt.condition} $${Number(evt.target).toFixed(2)}`
-            );
+            toastSuccess(`${evt.symbol} 가격 알림이 실행되었습니다. ${evt.condition} $${Number(evt.target).toFixed(2)}`);
           } catch (err) {
             console.warn('[ws] alert parse failed', err);
           }
@@ -50,8 +48,7 @@ export function useLivePrices() {
       debug: () => {},
     });
 
-    try { client.activate(); }
-    catch (err) { console.warn('[ws] activation failed', err); }
+    try { client.activate(); } catch (err) { console.warn('[ws] activation failed', err); }
     clientRef.current = client;
 
     return () => {

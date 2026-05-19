@@ -2,9 +2,10 @@ import { useMemo, useState } from 'react';
 import { Bookmark, Heart, MessageCircle, Share2 } from 'lucide-react';
 import CandleChart from './charts/CandleChart.jsx';
 import CommentPanel from './CommentPanel.jsx';
+import { useBinanceKlines } from '../hooks/useBinanceKlines.js';
 import { useMarketKlines } from '../hooks/useMarketKlines.js';
 import { useMarketStore } from '../stores/marketStore.js';
-import { changeClass, cn, displaySymbol, fmtMoney, fmtPct, fmtPrice, fmtVolume } from '../lib/utils.js';
+import { changeClass, cn, displaySymbol, fmtMoney, fmtPct, fmtVolume, pairSymbol } from '../lib/utils.js';
 
 const INTERVALS = ['15M', '1H', '4H', '1D', '1W'];
 
@@ -29,13 +30,14 @@ export default function AssetCard({ asset, onOpen }) {
   const [saved, setSaved] = useState(false);
   const [commentOpen, setCommentOpen] = useState(false);
   const flash = useMarketStore((s) => s.flashes[asset.symbol]);
-
-  const { candles: apiCandles, loading } = useMarketKlines(asset.symbol, interval, 100, asset.type);
-  const fallback = useMemo(() => generateFallbackCandles(asset.price || 100), [asset.price]);
-  const candles = apiCandles.length > 0 ? apiCandles : fallback;
   const isCrypto = asset.type === 'CRYPTO';
-  const up = (asset.changePercent24h ?? 0) >= 0;
-  const quote = isCrypto && asset.symbol?.startsWith('KRW-') ? 'KRW' : 'USD';
+
+  const binance = useBinanceKlines(isCrypto ? asset.symbol : null, interval, 100);
+  const market = useMarketKlines(asset.symbol, interval, 100, asset.type);
+  const sourceCandles = isCrypto ? binance.candles : market.candles;
+  const loading = isCrypto ? binance.loading : market.loading;
+  const fallback = useMemo(() => generateFallbackCandles(asset.price || 100), [asset.price]);
+  const candles = sourceCandles.length > 0 ? sourceCandles : fallback;
 
   return (
     <article className="glass-card overflow-hidden">
@@ -46,23 +48,23 @@ export default function AssetCard({ asset, onOpen }) {
           </div>
           <div className="min-w-0">
             <h3 className="font-bold text-base leading-tight truncate">{asset.name}</h3>
-            <p className="text-xs text-text-3 mono">{displaySymbol(asset.symbol)} · {quote}</p>
+            <p className="text-xs text-text-3 mono">{pairSymbol(asset.symbol, asset.type)} · {asset.type}</p>
           </div>
         </div>
         <div className="text-right shrink-0">
           <p className={cn('text-lg font-extrabold mono transition-colors', flash === 'up' && 'text-up', flash === 'down' && 'text-down')}>
-            {fmtMoney(asset.price, asset.type, asset.symbol)}
+            {fmtMoney(asset.price, asset.type)}
           </p>
           <p className={cn('text-xs font-semibold mono', changeClass(asset.changePercent24h))}>
-            {asset.change24h >= 0 ? '+' : ''}{fmtMoney(Math.abs(asset.change24h || 0), asset.type, asset.symbol)} · {fmtPct(asset.changePercent24h)}
+            {asset.change24h >= 0 ? '+' : ''}{fmtMoney(Math.abs(asset.change24h || 0), asset.type)} · {fmtPct(asset.changePercent24h)}
           </p>
         </div>
       </header>
 
       <div className="px-4">
         <div className="flex items-center justify-between text-[11px] text-text-3 mb-2">
-          <span className="mono">Upbit first market data</span>
-          {loading && <span>캔들 갱신 중</span>}
+          <span className="mono">{isCrypto ? 'Binance live market data' : 'Yahoo market data'}</span>
+          {loading && <span>차트 갱신 중</span>}
         </div>
         <CandleChart data={candles} height={220} />
       </div>
@@ -85,11 +87,11 @@ export default function AssetCard({ asset, onOpen }) {
         <div className="grid grid-cols-2 gap-4 text-right text-xs">
           <div>
             <p className="text-text-3">24H 고가</p>
-            <p className="font-bold mono text-up">{fmtMoney(asset.high24h, asset.type, asset.symbol)}</p>
+            <p className="font-bold mono text-up">{fmtMoney(asset.high24h, asset.type)}</p>
           </div>
           <div>
             <p className="text-text-3">24H 거래대금</p>
-            <p className="font-bold mono">{fmtVolume(asset.volume24h, asset.type, asset.symbol)}</p>
+            <p className="font-bold mono">{fmtVolume(asset.volume24h, asset.type)}</p>
           </div>
         </div>
       </div>

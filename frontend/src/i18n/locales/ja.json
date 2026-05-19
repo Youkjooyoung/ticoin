@@ -1,8 +1,8 @@
 {
   "app": {
     "name": "ticoin",
-    "tagline": "Upbit優先のリアルタイム投資ダッシュボード",
-    "version": "ticoin v0.6.0 · Upbit KRW market"
+    "tagline": "Binanceリアルタイム暗号資産とYahoo株式ダッシュボード",
+    "version": "ticoin v0.6.0 · Binance live market"
   },
   "nav": {
     "home": "ホーム",
@@ -24,7 +24,7 @@
     "close": "閉じる",
     "loading": "読み込み中...",
     "error": "エラー",
-    "success": "完了",
+    "success": "成功",
     "remove": "削除",
     "confirm": "確認"
   },
@@ -64,7 +64,7 @@
     "posts": "投稿",
     "totalReturn": "総リターン",
     "rank": "ランク",
-    "likes": "いいね",
+    "likes": "受け取ったいいね",
     "comments": "コメント",
     "trackedAssets": "追跡資産",
     "cryptoNews": "最新暗号資産ニュース",
@@ -74,7 +74,7 @@
     "defaultNickname": "guest",
     "edit": "プロフィール編集",
     "nickname": "ニックネーム",
-    "bio": "紹介",
+    "bio": "自己紹介",
     "removeImage": "画像を削除",
     "imageSizeError": "画像は5MB以下にしてください。",
     "imageProcessError": "画像処理に失敗しました: {{error}}",
@@ -98,9 +98,9 @@
     "allocation": "資産配分",
     "holdings": "保有資産",
     "noHoldings": "保有資産はまだありません。",
-    "symbol": "シンボル選択",
+    "symbol": "銘柄を選択",
     "quantity": "数量",
-    "avgPrice": "平均単価",
+    "avgPrice": "平均価格",
     "fieldsRequired": "すべての項目を入力してください。",
     "addSuccess": "{{symbol}}を追加しました。",
     "addFailed": "追加に失敗しました: {{error}}",

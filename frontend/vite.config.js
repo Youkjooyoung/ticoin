@@ -10,9 +10,9 @@ export default defineConfig({
       registerType: 'autoUpdate',
       includeAssets: ['favicon.ico'],
       manifest: {
-        name: 'ticoin 업비트 투자 대시보드',
+        name: 'ticoin Binance live dashboard',
         short_name: 'ticoin',
-        description: '업비트 KRW 마켓 기반 실시간 가상자산·주식 소셜 대시보드',
+        description: 'Real-time crypto and stock social dashboard powered by Binance live market data.',
         theme_color: '#007AFF',
         background_color: '#080B12',
         display: 'standalone',

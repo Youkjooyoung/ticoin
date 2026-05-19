@@ -1,26 +1,13 @@
-# ticoin
+# Ticoin
 
-업비트 KRW 마켓을 우선 데이터 소스로 사용하는 실시간 가상자산·주식 소셜 대시보드입니다. 캔들 차트, WebSocket 가격 브로드캐스트, 포트폴리오, 관심목록, 가격 알림, 소셜 피드, OpenAI 기반 AI 시장 분석을 제공합니다.
+Binance 실시간 코인 시세와 Yahoo Finance 주식 시세를 함께 보여주는 소셜 투자 대시보드입니다. 캔들 차트, WebSocket 가격 갱신, 포트폴리오, 관심목록, 가격 알림, 소셜 피드, OpenAI 기반 AI 시장 분석을 제공합니다.
 
 ## Tech Stack
 
-### Backend
-
-- Java 21, Spring Boot 3.4.1, Gradle
-- Spring Web, WebFlux WebClient, Spring Data JPA, Hibernate
-- PostgreSQL 16, Flyway, `ddl-auto: validate`
-- Spring Security, JWT, OAuth2 Google/Kakao
-- WebSocket/STOMP, SockJS
-- Caffeine Cache, Actuator, springdoc-openapi
-- External APIs: Upbit, Yahoo Finance, CoinGecko fallback, CryptoCompare, Reddit, Google News, OpenAI Responses API
-
-### Frontend
-
-- React 18.3, Vite 6, Tailwind CSS 3.4
-- Zustand, React Router 6, Axios
-- i18next ko/en/ja
-- lucide-react, Canvas candle chart
-- Playwright E2E
+- Backend: Java 21, Spring Boot 3.4.1, PostgreSQL 16, Flyway, WebSocket/STOMP, WebFlux WebClient
+- Frontend: React 18.3, Vite 6, Tailwind CSS, Zustand, i18next, Playwright
+- Market data: Binance REST/WebSocket, CoinGecko fallback, Yahoo Finance
+- AI: OpenAI Responses API
 
 ## Ports
 
@@ -36,18 +23,11 @@
 ```bash
 docker compose up -d --build
 docker compose up -d postgres
-
-cd backend
-./gradlew bootRun
-./gradlew test
-
-cd frontend
-npm install
-npm run dev
-npm run build
-npx playwright test
-
-docker compose -f docker-compose.prod.yml up -d --build
+cd backend && ./gradlew bootRun
+cd backend && ./gradlew test
+cd frontend && npm install && npm run dev
+cd frontend && npm run build
+cd frontend && npx playwright test
 ```
 
 ## Environment
@@ -56,34 +36,33 @@ docker compose -f docker-compose.prod.yml up -d --build
 OPENAI_API_KEY=
 OPENAI_MODEL=gpt-5-mini
 OPENAI_URL=https://api.openai.com
-UPBIT_URL=https://api.upbit.com
-UPBIT_WS_URL=wss://api.upbit.com/websocket/v1
+CMC_API_KEY=
 ```
 
-## API
+Frontend Binance defaults:
 
-| Method | Path | Description |
+```bash
+VITE_BINANCE_REST_URL=https://api.binance.com
+VITE_BINANCE_WS_URL=wss://stream.binance.com:9443
+```
+
+## Public API
+
+| Method | Endpoint | Description |
 | --- | --- | --- |
-| GET | `/api/market/feed` | 업비트 KRW 코인과 Yahoo 주식 통합 피드 |
-| GET | `/api/market/coins` | 업비트 KRW 기본 코인 목록 |
-| GET | `/api/market/stocks` | Yahoo 주식 시세 |
-| GET | `/api/market/trending` | 업비트 거래대금 기반 트렌딩 |
-| GET | `/api/market/candles` | 업비트/Yahoo 캔들 |
-| GET | `/api/market/search` | 업비트 KRW 마켓 검색 |
-| GET | `/api/ai/status` | OpenAI 분석 기능 상태 |
-| GET | `/api/ai/analyze` | OpenAI 시장 분석 |
+| GET | `/api/market/feed` | CoinGecko crypto seed data and Yahoo stock feed |
+| GET | `/api/market/coins` | Default crypto list |
+| GET | `/api/market/stocks` | Default stock list |
+| GET | `/api/market/trending` | CoinGecko trending crypto |
+| GET | `/api/market/candles` | CoinGecko or Yahoo candles |
+| GET | `/api/market/search` | Crypto search by ticker/name mapping |
+| GET | `/api/ai/status` | OpenAI analysis status |
+| GET | `/api/ai/analyze` | OpenAI market analysis |
 
-## Data Policy
+## Market Data Policy
 
-- 코인 내부 심볼은 `KRW-BTC` 형식을 사용합니다.
-- 화면에서는 `BTC/KRW` 형식으로 표시합니다.
-- 단순 시세 조회 결과는 DB에 저장하지 않습니다.
-- 사용자 데이터는 포트폴리오, 관심목록, 알림, 프로필, 소셜 피드 테이블에만 저장합니다.
-
-## Docs
-
-- `AGENTS.md`: Codex 작업 지침
-- `docs/ARCHITECTURE.md`: 시스템 구조
-- `docs/CHANGELOG.md`: 변경 이력
-- `docs/DEVELOPMENT-LOG.md`: 작업 로그
-- `deploy/aws-deploy.md`: AWS 배포 가이드
+- Crypto cards use Binance WebSocket ticker updates for live prices.
+- Crypto charts use Binance REST for initial candles and Binance kline WebSocket for live candle updates.
+- Backend REST feed remains an initial/fallback data source.
+- Stock data stays on Yahoo Finance.
+- Quote and candle data are not persisted to PostgreSQL.

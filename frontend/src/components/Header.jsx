@@ -27,7 +27,7 @@ export default function Header() {
       <div className="max-w-[1180px] mx-auto px-4 md:px-8 h-16 flex items-center justify-between">
         <div>
           <h2 className="text-lg font-bold tracking-tight">{title}</h2>
-          <p className="hidden sm:block text-[11px] text-text-3 mt-0.5">Upbit KRW market · Yahoo stocks · OpenAI analysis</p>
+          <p className="hidden sm:block text-[11px] text-text-3 mt-0.5">Binance live crypto · Yahoo stocks · OpenAI analysis</p>
         </div>
         <div className="flex items-center gap-2">
           <QuickCreateDropdown
