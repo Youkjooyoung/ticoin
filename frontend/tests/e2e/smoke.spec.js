@@ -42,6 +42,6 @@ test.describe('ticoin smoke', () => {
     await page.goto('/login');
     await expect(page.getByText('ticoin')).toBeVisible();
     await expect(page.getByText(/Google/)).toBeVisible();
-    await expect(page.getByText(/Kakao/)).toBeVisible();
+    await expect(page.getByText(/카카오/)).toBeVisible();
   });
 });
