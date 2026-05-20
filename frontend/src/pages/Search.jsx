@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { Clock, Loader2, Search as SearchIcon, TrendingUp as TrendIcon, X } from 'lucide-react';
 import { useMarketStore } from '../stores/marketStore.js';
 import { useDebounce } from '../hooks/useDebounce.js';
+import { useBinanceTicker } from '../hooks/useBinanceTicker.js';
 import MiniChart from '../components/charts/MiniChart.jsx';
 import AssetDetailModal from '../components/AssetDetailModal.jsx';
 import { changeClass, cn, displaySymbol, fmtMoney, fmtPct } from '../lib/utils.js';
@@ -12,36 +13,53 @@ const TABS = [
 ];
 
 export default function Search() {
-  const { feed, loadFeed } = useMarketStore();
+  const { feed, coins, stocks, loadFeed, loadCoins, loadStocks } = useMarketStore();
   const [q, setQ] = useState('');
   const [tab, setTab] = useState('trending');
   const [recent, setRecent] = useState([]);
   const [selected, setSelected] = useState(null);
   const [focused, setFocused] = useState(false);
 
-  const debouncedQ = useDebounce(q, 300);
+  const debouncedQ = useDebounce(q, 250);
   const isTyping = q !== debouncedQ;
 
-  useEffect(() => { loadFeed(); }, [loadFeed]);
+  useEffect(() => {
+    loadFeed();
+    loadCoins();
+    loadStocks();
+  }, [loadFeed, loadCoins, loadStocks]);
+
+  const market = useMemo(() => {
+    const map = new Map();
+    for (const asset of [...coins, ...stocks, ...feed]) map.set(`${asset.type}:${asset.symbol}`, asset);
+    return [...map.values()];
+  }, [coins, stocks, feed]);
+
+  const cryptoSymbols = useMemo(
+    () => market.filter((asset) => asset.type === 'CRYPTO').map((asset) => asset.symbol),
+    [market]
+  );
+  useBinanceTicker(cryptoSymbols);
 
   const suggestions = useMemo(() => {
     if (!q) return [];
     const ql = q.toLowerCase();
-    return feed
-      .filter((a) => a.name.toLowerCase().includes(ql) || a.symbol.toLowerCase().includes(ql))
-      .slice(0, 8);
-  }, [q, feed]);
+    return market
+      .filter((asset) => asset.name.toLowerCase().includes(ql) || asset.symbol.toLowerCase().includes(ql))
+      .slice(0, 10);
+  }, [q, market]);
 
   const filtered = useMemo(() => {
     if (debouncedQ) {
       const ql = debouncedQ.toLowerCase();
-      return feed.filter((a) => a.name.toLowerCase().includes(ql) || a.symbol.toLowerCase().includes(ql));
+      return market.filter((asset) => asset.name.toLowerCase().includes(ql) || asset.symbol.toLowerCase().includes(ql));
     }
-    return tab === 'trending' ? feed : recent;
-  }, [debouncedQ, tab, feed, recent]);
+    if (tab === 'recent') return recent;
+    return market.filter((asset) => asset.type === 'CRYPTO').slice(0, 60);
+  }, [debouncedQ, tab, market, recent]);
 
   const onPick = (asset) => {
-    setRecent((list) => [asset, ...list.filter((x) => x.symbol !== asset.symbol)].slice(0, 8));
+    setRecent((list) => [asset, ...list.filter((x) => x.symbol !== asset.symbol || x.type !== asset.type)].slice(0, 10));
     setSelected(asset);
     setFocused(false);
   };
@@ -68,7 +86,7 @@ export default function Search() {
         {focused && q && suggestions.length > 0 && (
           <div className="absolute top-14 left-0 right-0 glass-card shadow-2xl z-20 max-h-[320px] overflow-y-auto">
             {suggestions.map((asset) => (
-              <AssetRow key={asset.symbol} asset={asset} onClick={() => onPick(asset)} compact />
+              <AssetRow key={`${asset.type}:${asset.symbol}`} asset={asset} onClick={() => onPick(asset)} compact />
             ))}
           </div>
         )}
@@ -86,17 +104,18 @@ export default function Search() {
               {label}
             </button>
           ))}
+          <span className="self-center text-xs text-text-3">Binance USDT 마켓 {coins.length.toLocaleString()}개</span>
         </div>
       )}
 
       <div className="space-y-2">
         {filtered.length === 0 && (
           <p className="text-center text-sm text-text-3 py-10">
-            {debouncedQ ? '검색 결과가 없습니다.' : '최근 검색 항목이 없습니다.'}
+            {debouncedQ ? '검색 결과가 없습니다.' : '최근 검색 내역이 없습니다.'}
           </p>
         )}
         {filtered.map((asset) => (
-          <AssetRow key={asset.symbol} asset={asset} onClick={() => onPick(asset)} />
+          <AssetRow key={`${asset.type}:${asset.symbol}`} asset={asset} onClick={() => onPick(asset)} />
         ))}
       </div>
 
@@ -108,7 +127,7 @@ export default function Search() {
 function AssetRow({ asset, onClick, compact = false }) {
   const sparkline = asset.sparkline?.length
     ? asset.sparkline
-    : Array.from({ length: 20 }, (_, i) => (asset.price || 1) * (1 + Math.sin(i) * 0.02));
+    : Array.from({ length: 20 }, (_, i) => (asset.price || 1) * (1 + Math.sin(i) * 0.015));
 
   return (
     <button onMouseDown={(e) => compact && e.preventDefault()} onClick={onClick} className="w-full glass-card p-4 flex items-center gap-4 hover:border-border-strong transition-colors text-left">

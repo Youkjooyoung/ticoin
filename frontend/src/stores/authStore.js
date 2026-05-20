@@ -48,6 +48,32 @@ export const useAuthStore = create((set, get) => ({
     }
   },
 
+  login: async ({ email, password }) => {
+    set({ loading: true });
+    try {
+      const res = await api.post('/auth/login', { email, password });
+      get().setToken(res.data.token);
+      set({ user: res.data.user, loading: false });
+      return res.data.user;
+    } catch (error) {
+      set({ loading: false });
+      throw error;
+    }
+  },
+
+  register: async ({ email, password, name }) => {
+    set({ loading: true });
+    try {
+      const res = await api.post('/auth/register', { email, password, name });
+      get().setToken(res.data.token);
+      set({ user: res.data.user, loading: false });
+      return res.data.user;
+    } catch (error) {
+      set({ loading: false });
+      throw error;
+    }
+  },
+
   setToken: (token) => {
     if (token) {
       window.localStorage.setItem(TOKEN_KEY, token);

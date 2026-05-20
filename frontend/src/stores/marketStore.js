@@ -10,6 +10,8 @@ const FALLBACK_FEED = [
   { symbol: 'DOGE', name: 'Dogecoin', type: 'CRYPTO', price: 0.158, change24h: -0.005, changePercent24h: -3.12, marketCap: 23e9, volume24h: 1.1e9, high24h: 0.164, low24h: 0.155, sparkline: [] },
 ];
 
+const FALLBACK_SYMBOLS = FALLBACK_FEED.map((asset) => asset.symbol);
+
 function normalizeAsset(asset) {
   if (!asset) return asset;
   if (asset.type !== 'CRYPTO') return asset;
@@ -39,6 +41,18 @@ function updateList(list, symbol, update) {
   let changed = false;
   const next = list.map((asset) => {
     if (asset.symbol !== symbol) return asset;
+    changed = true;
+    return mergeAsset(asset, update);
+  });
+  return changed ? next : list;
+}
+
+function updateListBulk(list, updates) {
+  if (!list.length || updates.size === 0) return list;
+  let changed = false;
+  const next = list.map((asset) => {
+    const update = updates.get(asset.symbol);
+    if (!update) return asset;
     changed = true;
     return mergeAsset(asset, update);
   });
@@ -119,6 +133,45 @@ export const useMarketStore = create((set, get) => ({
     }
   },
 
+  bulkUpdatePrices: (updates) => {
+    if (!Array.isArray(updates) || updates.length === 0) return;
+    const normalizedUpdates = new Map();
+    const state = get();
+    const previous = new Map([
+      ...state.feed,
+      ...state.coins,
+      ...state.trending,
+    ].map((asset) => [asset.symbol, asset]));
+    const flashes = { ...state.flashes };
+    const changedSymbols = [];
+
+    for (const update of updates) {
+      const normalized = normalizeAsset({ symbol: update.symbol, type: 'CRYPTO' }).symbol;
+      normalizedUpdates.set(normalized, update);
+      const current = previous.get(normalized);
+      if (current?.price != null && update.price != null && current.price !== update.price) {
+        flashes[normalized] = update.price > current.price ? 'up' : 'down';
+        changedSymbols.push(normalized);
+      }
+    }
+
+    set((current) => ({
+      feed: updateListBulk(current.feed, normalizedUpdates),
+      coins: updateListBulk(current.coins, normalizedUpdates),
+      trending: updateListBulk(current.trending, normalizedUpdates),
+      flashes,
+    }));
+
+    if (changedSymbols.length > 0) {
+      setTimeout(() => {
+        const current = get();
+        const cleared = { ...current.flashes };
+        for (const symbol of changedSymbols) delete cleared[symbol];
+        set({ flashes: cleared });
+      }, 700);
+    }
+  },
+
   mergeFeed: (incoming) => {
     if (!Array.isArray(incoming) || incoming.length === 0) return;
     const normalizedIncoming = incoming.map(normalizeAsset);
@@ -148,3 +201,5 @@ export const useMarketStore = create((set, get) => ({
     }
   },
 }));
+
+export const defaultCryptoSymbols = FALLBACK_SYMBOLS;

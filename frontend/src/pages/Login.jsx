@@ -1,83 +1,144 @@
-import { useEffect } from 'react';
-import { Link } from 'react-router-dom';
-import { useTranslation } from 'react-i18next';
-import { LogIn, Shield, Sparkles } from 'lucide-react';
+import { useEffect, useState } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
+import { Eye, EyeOff, LogIn, Mail, Shield, UserPlus } from 'lucide-react';
 import { useAuthStore } from '../stores/authStore.js';
+import { useToastStore } from '../stores/toastStore.js';
 import { cn } from '../lib/utils.js';
 
 const PROVIDER_STYLES = {
-  google: {
-    className: 'bg-white text-slate-900 border-slate-200 hover:bg-slate-50',
-    icon: <GoogleIcon />,
-  },
-  kakao: {
-    className: 'bg-[#FEE500] text-[#3C1E1E] border-[#FEE500] hover:brightness-95',
-    icon: <KakaoIcon />,
-  },
+  google: 'bg-white text-slate-900 border-slate-200 hover:bg-slate-50',
+  kakao: 'bg-[#FEE500] text-[#3C1E1E] border-[#FEE500] hover:brightness-95',
 };
 
 export default function Login() {
-  const { t } = useTranslation();
-  const { providers, loadProviders, loginWith } = useAuthStore();
+  const navigate = useNavigate();
+  const toast = useToastStore();
+  const { providers, loadProviders, loginWith, login, register, loading } = useAuthStore();
+  const [mode, setMode] = useState('login');
+  const [form, setForm] = useState({ email: '', password: '', name: '' });
+  const [showPassword, setShowPassword] = useState(false);
 
   useEffect(() => { loadProviders(); }, [loadProviders]);
 
-  return (
-    <div className="min-h-[60vh] flex items-center justify-center p-4">
-      <div className="glass-card p-8 max-w-md w-full text-center space-y-6">
-        <div className="w-16 h-16 mx-auto rounded-2xl gradient-brand-bg flex items-center justify-center">
-          <Sparkles className="w-8 h-8 text-white" />
-        </div>
-        <div>
-          <h1 className="text-2xl font-extrabold gradient-text">{t('app.name')}</h1>
-          <p className="text-sm text-text-3 mt-1">{t('app.tagline')}</p>
-        </div>
+  const submit = async (e) => {
+    e.preventDefault();
+    try {
+      if (mode === 'register') {
+        await register(form);
+        toast.success('회원가입이 완료되었습니다.');
+      } else {
+        await login(form);
+        toast.success('로그인되었습니다.');
+      }
+      navigate('/profile');
+    } catch (error) {
+      toast.error(error?.response?.data?.message ?? '로그인 처리 중 오류가 발생했습니다.');
+    }
+  };
 
-        <div className="space-y-2 pt-2">
-          {providers.map((provider) => {
-            const style = PROVIDER_STYLES[provider.id] || { className: 'bg-brand text-white', icon: <LogIn className="w-5 h-5" /> };
-            return (
+  return (
+    <div className="min-h-screen grid lg:grid-cols-[1fr_480px] bg-bg text-text-1">
+      <section className="hidden lg:flex flex-col justify-between p-10 border-r border-border bg-[rgb(var(--surface-1))]">
+        <div>
+          <Link to="/" className="text-xl font-extrabold">Ticoin</Link>
+          <p className="mt-3 text-sm text-text-3 max-w-md">Binance USDT 실시간 코인 시세와 Yahoo 주식 데이터를 한 화면에서 관리합니다.</p>
+        </div>
+        <div className="grid gap-3 max-w-md">
+          {['실시간 관심종목 관리', '포트폴리오와 가격 알림', 'OpenAI 기반 시장 분석'].map((item) => (
+            <div key={item} className="glass-card p-4 text-sm font-semibold">{item}</div>
+          ))}
+        </div>
+      </section>
+
+      <main className="flex items-center justify-center p-5">
+        <div className="w-full max-w-md space-y-6">
+          <div>
+            <h1 className="text-2xl font-extrabold">{mode === 'login' ? '로그인' : '회원가입'}</h1>
+            <p className="text-sm text-text-3 mt-1">계정으로 포트폴리오, 관심목록, 프로필을 이어서 사용하세요.</p>
+          </div>
+
+          <form onSubmit={submit} className="glass-card p-5 space-y-4">
+            {mode === 'register' && (
+              <Field label="이름">
+                <input
+                  value={form.name}
+                  onChange={(e) => setForm((v) => ({ ...v, name: e.target.value }))}
+                  className="input"
+                  placeholder="표시할 이름"
+                  maxLength={100}
+                />
+              </Field>
+            )}
+            <Field label="이메일">
+              <div className="relative">
+                <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-text-3" />
+                <input
+                  type="email"
+                  value={form.email}
+                  onChange={(e) => setForm((v) => ({ ...v, email: e.target.value }))}
+                  className="input pl-10"
+                  placeholder="you@example.com"
+                  required
+                />
+              </div>
+            </Field>
+            <Field label="비밀번호">
+              <div className="relative">
+                <input
+                  type={showPassword ? 'text' : 'password'}
+                  value={form.password}
+                  onChange={(e) => setForm((v) => ({ ...v, password: e.target.value }))}
+                  className="input pr-10"
+                  placeholder="8자 이상"
+                  minLength={8}
+                  required
+                />
+                <button type="button" onClick={() => setShowPassword((v) => !v)} className="absolute right-3 top-1/2 -translate-y-1/2 text-text-3" aria-label="비밀번호 보기 전환">
+                  {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                </button>
+              </div>
+            </Field>
+
+            <button disabled={loading} className="w-full h-11 rounded-lg bg-brand text-white font-bold flex items-center justify-center gap-2 disabled:opacity-60">
+              {mode === 'login' ? <LogIn className="w-4 h-4" /> : <UserPlus className="w-4 h-4" />}
+              {mode === 'login' ? '로그인' : '회원가입'}
+            </button>
+
+            <button
+              type="button"
+              onClick={() => setMode(mode === 'login' ? 'register' : 'login')}
+              className="w-full text-sm text-brand-light font-semibold"
+            >
+              {mode === 'login' ? '계정이 없나요? 회원가입' : '이미 계정이 있나요? 로그인'}
+            </button>
+          </form>
+
+          <div className="glass-card p-5 space-y-3">
+            <p className="text-xs text-text-3 flex items-center gap-1.5">
+              <Shield className="w-3.5 h-3.5" /> 소셜 로그인은 설정된 제공자만 활성화됩니다.
+            </p>
+            {providers.filter((provider) => provider.id !== 'local').map((provider) => (
               <button
                 key={provider.id}
                 disabled={!provider.enabled}
                 onClick={() => loginWith(provider.loginUrl)}
-                className={cn('w-full h-12 rounded-lg border flex items-center justify-center gap-3 font-semibold transition-all', style.className, !provider.enabled && 'opacity-60 cursor-not-allowed')}
+                className={cn('w-full h-10 rounded-lg border font-semibold transition-all', PROVIDER_STYLES[provider.id] ?? 'bg-bg-elev border-border', !provider.enabled && 'opacity-60 cursor-not-allowed')}
               >
-                {style.icon}
-                <span>{provider.label}{!provider.enabled && ' (설정 필요)'}</span>
+                {provider.label}{!provider.enabled && ' 설정 필요'}
               </button>
-            );
-          })}
+            ))}
+          </div>
         </div>
-
-        <div className="pt-4 border-t border-border">
-          <p className="text-xs text-text-3 flex items-center justify-center gap-1.5 mb-3">
-            <Shield className="w-3 h-3" /> 로그인하지 않아도 게스트 모드로 사용할 수 있습니다.
-          </p>
-          <Link to="/" className="inline-block text-sm text-brand-light font-semibold hover:underline">
-            대시보드로 돌아가기
-          </Link>
-        </div>
-      </div>
+      </main>
     </div>
   );
 }
 
-function GoogleIcon() {
+function Field({ label, children }) {
   return (
-    <svg width="20" height="20" viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">
-      <path fill="#FFC107" d="M43.611 20.083H42V20H24v8h11.303c-1.649 4.657-6.08 8-11.303 8-6.627 0-12-5.373-12-12s5.373-12 12-12c3.059 0 5.842 1.154 7.961 3.039l5.657-5.657C34.046 6.053 29.268 4 24 4 12.955 4 4 12.955 4 24s8.955 20 20 20 20-8.955 20-20c0-1.341-.138-2.65-.389-3.917z"/>
-      <path fill="#FF3D00" d="m6.306 14.691 6.571 4.819C14.655 15.108 18.961 12 24 12c3.059 0 5.842 1.154 7.961 3.039l5.657-5.657C34.046 6.053 29.268 4 24 4 16.318 4 9.656 8.337 6.306 14.691z"/>
-      <path fill="#4CAF50" d="M24 44c5.166 0 9.86-1.977 13.409-5.192l-6.19-5.238A11.91 11.91 0 0 1 24 36c-5.202 0-9.619-3.317-11.283-7.946l-6.522 5.025C9.505 39.556 16.227 44 24 44z"/>
-      <path fill="#1976D2" d="M43.611 20.083H42V20H24v8h11.303a12.04 12.04 0 0 1-4.087 5.571l.003-.002 6.19 5.238C36.971 39.205 44 34 44 24c0-1.341-.138-2.65-.389-3.917z"/>
-    </svg>
-  );
-}
-
-function KakaoIcon() {
-  return (
-    <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
-      <path d="M12 3C6.477 3 2 6.477 2 10.8c0 2.815 1.875 5.29 4.688 6.688l-1.188 4.313c-.094.406.375.75.719.5L11.25 19.5c.25.022.5.033.75.033 5.523 0 10-3.477 10-7.733S17.523 3 12 3z"/>
-    </svg>
+    <label className="block">
+      <span className="block text-xs font-semibold text-text-3 mb-1.5">{label}</span>
+      {children}
+    </label>
   );
 }

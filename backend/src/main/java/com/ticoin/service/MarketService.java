@@ -1,6 +1,7 @@
 package com.ticoin.service;
 
 import com.ticoin.client.CoinGeckoClient;
+import com.ticoin.client.BinanceClient;
 import com.ticoin.client.YahooFinanceClient;
 import com.ticoin.dto.AssetDto;
 import com.ticoin.dto.CandleDto;
@@ -17,6 +18,7 @@ import java.util.stream.Stream;
 public class MarketService {
 
     private final CoinGeckoClient coinGecko;
+    private final BinanceClient binance;
     private final YahooFinanceClient yahoo;
 
     private static final List<String> DEFAULT_COINS = List.of(
@@ -41,13 +43,15 @@ public class MarketService {
     );
 
     public List<AssetDto> getFeed() {
-        List<AssetDto> coins = coinGecko.fetchMarkets(DEFAULT_COINS);
+        List<AssetDto> coins = binance.fetchUsdtMarkets().stream().limit(80).toList();
+        if (coins.isEmpty()) coins = coinGecko.fetchMarkets(DEFAULT_COINS);
         List<AssetDto> stocks = yahoo.fetchQuotes(DEFAULT_STOCKS);
         return Stream.concat(coins.stream(), stocks.stream()).toList();
     }
 
     public List<AssetDto> getCoins() {
-        return coinGecko.fetchMarkets(DEFAULT_COINS);
+        List<AssetDto> coins = binance.fetchUsdtMarkets();
+        return coins.isEmpty() ? coinGecko.fetchMarkets(DEFAULT_COINS) : coins;
     }
 
     public List<AssetDto> getStocks() {
@@ -69,6 +73,8 @@ public class MarketService {
     }
 
     public List<AssetDto> searchCoins(String query) {
+        List<AssetDto> results = binance.searchUsdtMarkets(query);
+        if (!results.isEmpty()) return results;
         String id = toCoinId(query);
         return coinGecko.fetchMarkets(List.of(id));
     }

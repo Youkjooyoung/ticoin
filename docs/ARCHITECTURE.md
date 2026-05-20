@@ -38,9 +38,10 @@ flowchart LR
 Market flow:
 
 1. `MarketController` receives `/api/market/*`.
-2. `MarketService` routes crypto seed data to `CoinGeckoClient`.
-3. Stock requests continue through `YahooFinanceClient`.
-4. The frontend upgrades crypto prices and candles with Binance WebSocket streams.
+2. `MarketService` routes crypto market lists to `BinanceClient` and returns all active Binance USDT spot markets.
+3. CoinGecko remains the fallback when Binance REST is unavailable.
+4. Stock requests continue through `YahooFinanceClient`.
+5. The frontend upgrades crypto prices and candles with Binance WebSocket streams and short REST ticker correction polling.
 
 AI flow:
 
@@ -51,7 +52,7 @@ AI flow:
 
 ## Frontend
 
-- `useBinanceTicker`: live crypto price updates through Binance ticker streams
+- `useBinanceTicker`: live crypto price updates through Binance ticker streams plus short REST correction polling
 - `useBinanceKlines`: initial Binance candles plus live kline updates
 - `stores/marketStore.js`: seed data, live merges, flash state
 - `components/AssetCard.jsx`: live chart, price, social controls

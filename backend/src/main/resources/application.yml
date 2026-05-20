@@ -107,6 +107,8 @@ ticoin:
   api:
     coingecko:
       base-url: ${COINGECKO_URL:https://api.coingecko.com/api/v3}
+    binance:
+      base-url: ${BINANCE_REST_URL:https://api.binance.com}
     yahoo:
       base-url: ${YAHOO_URL:https://query1.finance.yahoo.com}
     cryptocompare:
