@@ -40,6 +40,9 @@ services:
       TICOIN_ALERT_INTERVAL_MS: ${ALERT_INTERVAL_MS:-20000}
       LOG_LEVEL_APP: ${LOG_LEVEL:-INFO}
       CMC_API_KEY: ${CMC_API_KEY:-}
+      OPENAI_API_KEY: ${OPENAI_API_KEY:-}
+      OPENAI_MODEL: ${OPENAI_MODEL:-gpt-5-mini}
+      OPENAI_URL: ${OPENAI_URL:-https://api.openai.com}
       JAVA_TOOL_OPTIONS: "-XX:+UseContainerSupport -XX:MaxRAMPercentage=75.0 -Djava.security.egd=file:/dev/./urandom"
     expose:
       - "8090"

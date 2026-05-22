@@ -1,264 +1,68 @@
-# ticoin · 주식 & 코인
+# Ticoin
 
-Figma AI 디자인 기반 주식/코인 실시간 소셜 대시보드. 다크 + 퍼플 테마, 바이낸스 스타일 캔들 차트, 실시간 WebSocket 가격 스트림.
+Binance 실시간 코인 시세와 Yahoo Finance 주식 시세를 함께 보여주는 소셜 투자 대시보드입니다. 캔들 차트, WebSocket 가격 갱신, 포트폴리오, 관심목록, 가격 알림, 소셜 피드, OpenAI 기반 AI 시장 분석을 제공합니다.
 
-## 기술 스택
+## Tech Stack
 
-**Frontend**
-- React 18 + Vite 6
-- Tailwind CSS 3 (다크 모드)
-- Zustand (marketStore + toastStore)
-- React Router 6 + ErrorBoundary + 404 페이지
-- Axios + Vite `/api` 프록시
-- `@stomp/stompjs` + `sockjs-client` (WebSocket 실시간 가격)
-- lucide-react 아이콘
-- Canvas 기반 CandleChart (Binance 스타일, MA7/MA25, 볼륨)
-- SVG LineChart + MiniChart (재사용)
-- Toast 시스템, 스켈레톤 로더, AssetDetailModal
+- Backend: Java 21, Spring Boot 3.4.1, PostgreSQL 16, Flyway, WebSocket/STOMP, WebFlux WebClient
+- Frontend: React 18.3, Vite 6, Tailwind CSS, Zustand, i18next, Playwright
+- Market data: Binance REST/WebSocket, CoinGecko fallback, Yahoo Finance
+- AI: OpenAI Responses API
 
-**Backend**
-- Java 21 + Spring Boot 3.4 (Gradle)
-- Spring Web + WebFlux(WebClient) + Data JPA + Validation + Cache(Caffeine)
-- **Spring WebSocket (STOMP)** — 실시간 가격 브로드캐스트
-- **Flyway** 마이그레이션 (`db/migration/V1__init.sql`)
-- **Spring Boot Actuator** (`/actuator/health`)
-- **springdoc-openapi** (`/swagger-ui.html`, `/v3/api-docs`)
-- **Global exception handler** (`@RestControllerAdvice` + `ErrorResponse`)
-- DTO 유효성 검증 (`PortfolioCreateRequest`, `WatchlistCreateRequest`)
-- PostgreSQL 16
-- 통합 테스트 (MockMvc + H2)
+## Ports
 
-**Infra**
-- Docker Compose (postgres + backend + frontend)
-- Nginx (프론트 서빙 + `/api` 프록시)
+| Service | Port |
+| --- | --- |
+| Frontend Vite | 5175 |
+| Frontend Docker/nginx | 5174 |
+| Backend | 8090 |
+| PostgreSQL Docker | 5434 -> 5432 |
 
-## 외부 API
+## Commands
 
-| 데이터 | 1순위 | 대체 |
-| --- | --- | --- |
-| 코인 시세 | **CoinGecko** `/coins/markets` (무료) | — |
-| 코인 OHLC | **CoinGecko** `/coins/{id}/ohlc` | — |
-| 주식 시세 | **Yahoo Finance** `query1.finance.yahoo.com` (무료, 비공식) | Alpha Vantage, Finnhub |
-| 주식 차트 | **Yahoo Finance** `/v8/finance/chart` | — |
-| 암호화폐 뉴스 | **CryptoCompare News API** (무료) | CoinMarketCap Pro(유료) |
-
-> CoinMarketCap 뉴스는 Pro 전용이라 기본값은 **CryptoCompare**. `CMC_API_KEY` 환경변수로 Pro 키 주입 가능.
-
-## 구조
-
-```
-ticoin/
-├── backend/                          # Spring Boot 3.4
-│   ├── src/main/java/com/ticoin/
-│   │   ├── TicoinApplication.java    # @EnableCaching + @EnableScheduling
-│   │   ├── client/                   # CoinGecko / Yahoo / CryptoCompare
-│   │   ├── config/WebConfig.java     # CORS + WebClient
-│   │   ├── controller/               # Market, News, Portfolio, Watchlist
-│   │   ├── dto/                      # records: Asset/Candle/News/*CreateRequest
-│   │   ├── entity/                   # Portfolio, Watchlist
-│   │   ├── exception/                # GlobalExceptionHandler + ErrorResponse
-│   │   ├── repository/
-│   │   ├── service/
-│   │   └── websocket/                # WebSocketConfig + PriceStreamService
-│   ├── src/main/resources/
-│   │   ├── application.yml
-│   │   └── db/migration/V1__init.sql
-│   ├── src/test/                     # MockMvc 통합 테스트
-│   ├── build.gradle
-│   └── Dockerfile
-├── frontend/                         # React 18 + Vite 6
-│   ├── src/
-│   │   ├── App.jsx                   # ErrorBoundary + ToastContainer 루트
-│   │   ├── components/
-│   │   │   ├── AssetCard.jsx + AssetDetailModal.jsx
-│   │   │   ├── Sidebar/BottomNav/Header/StoryBar
-│   │   │   ├── Toast.jsx + ErrorBoundary.jsx
-│   │   │   ├── charts/ (CandleChart, LineChart, MiniChart)
-│   │   │   └── skeletons/ (AssetCard, News, List)
-│   │   ├── hooks/                    # useLivePrices, useDebounce
-│   │   ├── layouts/RootLayout.jsx
-│   │   ├── pages/                    # Home, Search, Trending, Portfolio, Watchlist, Profile, NotFound
-│   │   ├── stores/                   # marketStore, toastStore
-│   │   ├── api/                      # axios + market/news/portfolio/watchlist
-│   │   ├── lib/utils.js
-│   │   └── styles/index.css          # Tailwind + keyframes
-│   ├── package.json
-│   ├── vite.config.js                # port 5174 strict, /api + /ws proxy
-│   ├── tailwind.config.js
-│   └── Dockerfile
-└── docker-compose.yml
-```
-
-## 실행
-
-### Docker Compose (전체)
 ```bash
 docker compose up -d --build
-# frontend → http://localhost:5174
-# backend  → http://localhost:8090 (swagger: /swagger-ui.html)
-# postgres → localhost:5433
-```
-
-### 로컬 개발 (Vite HMR + Spring Boot)
-```bash
-# 1. Postgres만 컨테이너로
 docker compose up -d postgres
-
-# 2. 백엔드
-cd backend
-./gradlew bootRun       # 또는 gradle bootRun (wrapper 없을 때)
-
-# 3. 프론트엔드 (새 터미널)
-cd frontend
-npm install             # 최초 1회
-npm run dev             # → http://localhost:5174
+cd backend && ./gradlew bootRun
+cd backend && ./gradlew test
+cd frontend && npm install && npm run dev
+cd frontend && npm run build
+cd frontend && npx playwright test
 ```
 
-Vite dev 서버는 `/api`와 `/ws`를 `http://localhost:8090`으로 자동 프록시.
+## Environment
 
-## 주요 엔드포인트
+```bash
+OPENAI_API_KEY=
+OPENAI_MODEL=gpt-5-mini
+OPENAI_URL=https://api.openai.com
+CMC_API_KEY=
+```
 
-| Method | Path | 설명 |
+Frontend Binance defaults:
+
+```bash
+VITE_BINANCE_REST_URL=https://api.binance.com
+VITE_BINANCE_WS_URL=wss://stream.binance.com:9443
+```
+
+## Public API
+
+| Method | Endpoint | Description |
 | --- | --- | --- |
-| GET | `/api/market/feed` | 전체 피드 (코인 + 주식) |
-| GET | `/api/market/coins` | 코인 목록 |
-| GET | `/api/market/stocks` | 주식 목록 |
-| GET | `/api/market/trending` | 트렌딩 |
-| GET | `/api/market/candles?symbol=X&type=CRYPTO&interval=1D` | OHLC 캔들 |
-| GET | `/api/market/search?q=...` | 검색 |
-| GET | `/api/news?category=BTC` | 크립토 뉴스 |
-| GET / POST / DELETE | `/api/portfolio` | 포트폴리오 CRUD (검증) |
-| GET / POST / PATCH / DELETE | `/api/watchlist` | 관심목록 CRUD (검증) |
-| WS | `/ws` → `/topic/prices` | STOMP 실시간 가격 푸시 (15초 주기) |
-| GET | `/actuator/health` | 헬스체크 |
-| GET | `/swagger-ui.html` | API 문서 |
+| GET | `/api/market/feed` | CoinGecko crypto seed data and Yahoo stock feed |
+| GET | `/api/market/coins` | Default crypto list |
+| GET | `/api/market/stocks` | Default stock list |
+| GET | `/api/market/trending` | CoinGecko trending crypto |
+| GET | `/api/market/candles` | CoinGecko or Yahoo candles |
+| GET | `/api/market/search` | Crypto search by ticker/name mapping |
+| GET | `/api/ai/status` | OpenAI analysis status |
+| GET | `/api/ai/analyze` | OpenAI market analysis |
 
-## 페이지
+## Market Data Policy
 
-| Path | 설명 |
-| --- | --- |
-| `/` | 피드 + StoryBar + **AssetDetailModal** + **가격 flash 펄스** (WS) |
-| `/search` | **300ms 디바운스** 검색 + 트렌딩/최근 검색 탭 |
-| `/trending` | 최고 상승 / 실시간 랭킹 / 하락 종목 |
-| `/portfolio` | 총자산 + **7일 수익률 LineChart** + 자산배분 도넛 + 실제 DB CRUD + Toast |
-| `/watchlist` | 관심자산 + 목표가 + 알림 토글 + ↑↓ 정렬 + 실제 DB CRUD |
-| `/alerts` | **가격 알림 CRUD** + 발동된 알림 실시간 WS 푸시 |
-| `/profile` | 프로필 + 크립토 뉴스 (Reddit 폴백) + 설정 |
-| `*` | 404 NotFound 페이지 |
-
-## v0.4.0 — UX 대수정 + 실시간 거래소급 반영 (2026-04-15)
-
-사용자 피드백 13개 항목 전부 반영. 실시간성과 입력 편의성을 중심으로 대규모 수정.
-
-### 핵심 개선
-- **Binance WebSocket 직결** — 프론트엔드가 `wss://stream.binance.com:9443/stream`에 직접 구독. 초당 수 회 tick 업데이트로 실제 거래소 수준의 반응성 (실측: BTC 1.5초 간격으로 센트 단위 변화)
-- **Binance REST klines** — 차트 인터벌 버튼(15M/1H/4H/1D/1W) 전부 실제 데이터 로드. CoinGecko의 고정 granularity 한계 우회
-- **가격 flash 펄스** — 가격 변동 시 600ms 동안 상승/하락 색상 강조 (`marketStore.flashes` 맵)
-
-### 신규 컴포넌트
-- **`SymbolSelect`** — `marketStore.feed`에서 옵션 로드, 각 옵션에 현재가 표시. Portfolio/Watchlist/Alerts 모든 심볼 입력 교체
-- **`PriceInput`** — 참조가격에 따라 `step` 자동 계산. 1000만↑→1만, 100→1, 0.01→0.0001. `min="0"` 음수 차단
-- **`CommentPanel`** — AssetCard 댓글 토글, 백엔드 CRUD 연동, 본인 댓글만 삭제
-- **`NotificationDropdown`** — 헤더 🔔 버튼, `alertStore.triggered` 실시간 목록
-- **`QuickCreateDropdown`** — 헤더 `+` 버튼, 포트폴리오/관심목록/알림/검색 빠른 이동
-
-### 백엔드 (Flyway V3)
-- **Comments** — `comment` 테이블, 심볼별/기기별 CRUD, 500자 제한
-- **Profile** — `profile` 테이블, 기기별 닉네임/자기소개/아바타 URL, `getOrCreate` 패턴
-
-### 페이지 개선
-- **Search** — 입력 즉시 상위 8개 자동완성 드롭다운
-- **Trending** — 최고상승/실시간랭킹/하락종목 전부 클릭 가능, AssetDetailModal 열림
-- **Profile** — 편집 모달 (닉네임/자기소개/아바타 FileReader→base64), 설정 메뉴 4개 전부 활성화 (계정/알림 토글/다크모드 토글/도움말/로그아웃)
-- **Sidebar** — ticoin 로고가 `<NavLink to="/">` (홈으로)
-- **Header** — 페이지별 타이틀 매핑, `+`/🔔 드롭다운 outside-click 닫기
-
-### 가격 step 유틸 (`lib/price.js`)
-| 참조가격 | step |
-|---|---|
-| ≥ 10,000,000 | 10,000 |
-| ≥ 1,000,000 | 1,000 |
-| ≥ 100,000 | 100 |
-| ≥ 10,000 | 10 |
-| ≥ 1,000 | 10 |
-| ≥ 100 | 1 |
-| ≥ 10 | 0.1 |
-| ≥ 1 | 0.01 |
-| ≥ 0.1 | 0.001 |
-| ≥ 0.01 | 0.0001 |
-| ≥ 0.001 | 0.00001 |
-
-### 버그 수정
-- **CandleChart canvas width=0** — 최초 `useEffect`에서 `getBoundingClientRect()`가 0을 반환하는 타이밍 이슈. `ResizeObserver`로 부모 크기 추적하도록 전면 재작성
-- **Docker frontend CRLF** — `docker-entrypoint.sh`가 Windows CRLF로 커밋되어 Linux 컨테이너에서 `exec: no such file or directory` 실패. Dockerfile에 `sed -i 's/\r$//'` 추가
-
-### 추가 문서
-- `docs/CHANGELOG.md` — 전체 버전별 변경사항
-- `docs/DEVELOPMENT-LOG.md` — 세션별 개발 일지
-- `docs/ARCHITECTURE.md` — 시스템 구조 / 데이터 흐름 / 의사결정 기록
-
----
-
-## v0.3.0 — 풀스택 구현 + AWS 운영 준비 (2026-04-15)
-
-기존 스켈레톤을 진짜 동작하는 앱으로 만들고 AWS 운영 배포 준비까지 완료.
-
-### Backend 강화
-- **Device Identity** — `X-Device-Id` 헤더 필터 + `@DeviceId` argument resolver. 로그인 없이도 기기별 데이터 영속화
-- **Price Alerts** — `price_alert` 테이블 + CRUD + `@Scheduled` 체커가 20초 주기로 목표가 검사, 도달 시 `/topic/alerts/{deviceId}` WebSocket 푸시
-- **Flyway V2 마이그레이션** — `device_id` 컬럼 + alerts 테이블 + 유니크 제약 재설정 (device + symbol)
-- **Portfolio/Watchlist 재작성** — 파생 쿼리(`findByDeviceIdOrderByCreatedAtDesc`)로 low-code, 전부 device_id 스코프
-- **Multi-profile** — `application-local.yml` / `application-prod.yml` + 환경변수 외재화 (`SPRING_PROFILES_ACTIVE`, `DB_*`, `TICOIN_CORS_ORIGINS`, …)
-- **logback-spring.xml** — local은 컬러 콘솔 + MDC deviceId, prod는 CloudWatch-friendly 한 줄 포맷
-- **Build Info** — `springBoot.buildInfo` → `/actuator/info`에 버전·빌드 시각 노출
-- **Graceful shutdown** + `management.endpoint.health.probes.enabled`로 liveness/readiness 분리
-- **News fallback** — CryptoCompare 유료화 대응, Reddit r/CryptoCurrency 자동 폴백
-
-### Frontend 실구현
-- **Device ID util** — `lib/device.js`가 localStorage에 UUID 생성·캐시
-- **Axios interceptor** — 모든 API 요청에 `X-Device-Id` 자동 주입
-- **alertStore (Zustand)** — 알림 CRUD + 발동된 알림 히스토리 (최근 5개)
-- **useLivePrices 확장** — `/topic/prices` 구독 + `/topic/alerts/{deviceId}` 구독 (발동 시 Toast)
-- **가격 flash 펄스** — `mergeFeed`가 이전 가격과 비교해 변동 방향을 `flashes` 맵에 저장, `AssetCard`에서 900ms 동안 상승/하락 색상 강조
-- **Alerts 페이지** (`/alerts`) — 목표가 ABOVE/BELOW 등록, 최근 발동 이력, 삭제
-- **Mock 폴백 제거** — Portfolio/Watchlist가 이제 실제 DB만 사용, 에러 시 Toast로 알림
-- **백엔드 연동 API 추가** — `alertApi` 래퍼
-
-### AWS 운영 배포 준비
-- **`docker-compose.prod.yml`** — 이미지 태그 주입 가능, 메모리 리밋, readiness probe, JVM 컨테이너 옵션
-- **Nginx runtime env** — `nginx.conf.template` + `docker-entrypoint.sh` + `envsubst`로 `BACKEND_URL` 런타임 주입 (이미지 재빌드 없이 환경 전환)
-- **프런트 `/healthz`** — ALB 타겟 헬스체크용
-- **`.env.prod.example`** — 안전한 기본값
-- **`deploy/aws-deploy.md`** — EC2 / ECS Fargate / App Runner 3가지 경로별 단계별 가이드
-- **JVM 튜닝** — `-XX:MaxRAMPercentage=75.0` 컨테이너 친화 옵션
-- **Prometheus endpoint** (prod 프로파일 전용) — 추후 CloudWatch Container Insights 연동 가능
-
-### 주요 추가 파일
-Backend: `DeviceIdFilter`, `DeviceIdArgumentResolver`, `PriceAlert`, `PriceAlertRepository`, `PriceAlertService`, `PriceAlertController`, `AlertCreateRequest`, `V2__device_identity_and_alerts.sql`, `application-local.yml`, `application-prod.yml`, `logback-spring.xml`, `RedditNewsClient`
-Frontend: `lib/device.js`, `stores/alertStore.js`, `pages/Alerts.jsx`
-Infra: `nginx.conf.template`, `docker-entrypoint.sh`, `docker-compose.prod.yml`, `.env.prod.example`, `deploy/aws-deploy.md`
-
-## 고도화 버전 (v0.2.0)
-
-2026-04-15 추가 기능:
-- ✅ Global exception handler + DTO 검증
-- ✅ Flyway DB 마이그레이션 + `ddl-auto: validate`
-- ✅ Actuator + OpenAPI Swagger
-- ✅ WebSocket STOMP 실시간 가격 스트림 (15초 주기)
-- ✅ Controller 통합 테스트 (MockMvc + H2)
-- ✅ AssetDetailModal (클릭 시 큰 차트)
-- ✅ useLivePrices WebSocket 훅
-- ✅ useDebounce 검색
-- ✅ LineChart 기반 포트폴리오 7일 수익률
-- ✅ Toast 시스템 (success/error/info)
-- ✅ ErrorBoundary + NotFound 404
-- ✅ AssetCard/List/News 스켈레톤 로더
-- ✅ 관심목록 ↑↓ 재정렬 + localStorage 영속화
-
-## 디자인 가이드
-
-- Figma Make 원본 유지 (다크 + 퍼플 액센트)
-- 브랜드: `#8B5CF6` (indigo-violet)
-- 상승/하락: `#10B981` / `#EF4444` (바이낸스 스타일)
-- 폰트: Inter (본문), JetBrains Mono (숫자)
-- 캔들 차트: Canvas 기반, Binance 스타일, MA7/MA25 오버레이
+- Crypto cards use Binance WebSocket ticker updates for live prices.
+- Crypto charts use Binance REST for initial candles and Binance kline WebSocket for live candle updates.
+- Backend REST feed remains an initial/fallback data source.
+- Stock data stays on Yahoo Finance.
+- Quote and candle data are not persisted to PostgreSQL.

@@ -5,6 +5,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -24,6 +25,14 @@ public class GlobalExceptionHandler {
         );
     }
 
+    @ExceptionHandler(HttpMessageNotReadableException.class)
+    public ResponseEntity<ErrorResponse> handleUnreadable(HttpMessageNotReadableException ex, HttpServletRequest req) {
+        log.warn("Unreadable request at {}: {}", req.getRequestURI(), ex.getMessage());
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(
+                ErrorResponse.of(400, "Bad Request", "요청 형식이 올바르지 않습니다.", req.getRequestURI())
+        );
+    }
+
     @ExceptionHandler(EntityNotFoundException.class)
     public ResponseEntity<ErrorResponse> handleNotFound(EntityNotFoundException ex, HttpServletRequest req) {
         log.warn("Not found at {}: {}", req.getRequestURI(), ex.getMessage());
@@ -39,7 +48,7 @@ public class GlobalExceptionHandler {
                 .toList();
         log.warn("Validation failed at {}: {}", req.getRequestURI(), details);
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(
-                ErrorResponse.of(400, "Validation Failed", "요청 데이터가 유효하지 않습니다", req.getRequestURI(), details)
+                ErrorResponse.of(400, "Validation Failed", "입력값을 다시 확인해 주세요.", req.getRequestURI(), details)
         );
     }
 
@@ -47,7 +56,7 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ErrorResponse> handleGeneral(Exception ex, HttpServletRequest req) {
         log.error("Unhandled exception at {}", req.getRequestURI(), ex);
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(
-                ErrorResponse.of(500, "Internal Server Error", "서버 내부 오류가 발생했습니다", req.getRequestURI())
+                ErrorResponse.of(500, "Internal Server Error", "서버 내부 오류가 발생했습니다.", req.getRequestURI())
         );
     }
 

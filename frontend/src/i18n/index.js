@@ -7,9 +7,9 @@ import en from './locales/en.json';
 import ja from './locales/ja.json';
 
 export const SUPPORTED_LANGUAGES = [
-  { code: 'ko', label: '한국어', flag: '🇰🇷' },
-  { code: 'en', label: 'English', flag: '🇺🇸' },
-  { code: 'ja', label: '日本語', flag: '🇯🇵' },
+  { code: 'ko', label: '한국어', flag: 'KR' },
+  { code: 'en', label: 'English', flag: 'EN' },
+  { code: 'ja', label: '日本語', flag: 'JP' },
 ];
 
 i18n

@@ -2,6 +2,10 @@ import { create } from 'zustand';
 import api from '../api/axios.js';
 
 const TOKEN_KEY = 'ticoin.token';
+const FALLBACK_PROVIDERS = [
+  { id: 'google', label: 'Google', loginUrl: '/oauth2/authorization/google', enabled: false },
+  { id: 'kakao', label: 'Kakao', loginUrl: '/oauth2/authorization/kakao', enabled: false },
+];
 
 function readStoredToken() {
   if (typeof window === 'undefined') return null;
@@ -20,7 +24,7 @@ export const useAuthStore = create((set, get) => ({
       const res = await api.get('/auth/providers');
       set({ providers: res.data.providers ?? [], guestMode: res.data.guestMode ?? true });
     } catch (e) {
-      set({ providers: [], guestMode: true });
+      set({ providers: FALLBACK_PROVIDERS, guestMode: true });
     }
   },
 
@@ -41,6 +45,32 @@ export const useAuthStore = create((set, get) => ({
       }
     } catch {
       set({ user: null, loading: false });
+    }
+  },
+
+  login: async ({ email, password }) => {
+    set({ loading: true });
+    try {
+      const res = await api.post('/auth/login', { email, password });
+      get().setToken(res.data.token);
+      set({ user: res.data.user, loading: false });
+      return res.data.user;
+    } catch (error) {
+      set({ loading: false });
+      throw error;
+    }
+  },
+
+  register: async ({ email, password, name }) => {
+    set({ loading: true });
+    try {
+      const res = await api.post('/auth/register', { email, password, name });
+      get().setToken(res.data.token);
+      set({ user: res.data.user, loading: false });
+      return res.data.user;
+    } catch (error) {
+      set({ loading: false });
+      throw error;
     }
   },
 

@@ -33,6 +33,9 @@ public class User {
     @Column(name = "avatar_url", columnDefinition = "TEXT")
     private String avatarUrl;
 
+    @Column(name = "password_hash")
+    private String passwordHash;
+
     @Column(nullable = false, length = 32)
     @Builder.Default
     private String role = "USER";

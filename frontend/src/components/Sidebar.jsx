@@ -1,7 +1,8 @@
 import { NavLink } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { Home, Search, TrendingUp, Wallet, Star, Bell, User, Settings } from 'lucide-react';
+import { Home, Search, TrendingUp, Wallet, Star, Bell, User, Settings, LogIn, LogOut } from 'lucide-react';
 import { cn } from '../lib/utils.js';
+import { useAuthStore } from '../stores/authStore.js';
 
 const NAV = [
   { to: '/', key: 'nav.home', icon: Home },
@@ -15,11 +16,12 @@ const NAV = [
 
 export default function Sidebar() {
   const { t } = useTranslation();
+  const { user, logout } = useAuthStore();
   return (
-    <aside className="hidden md:flex fixed inset-y-0 left-0 w-60 flex-col border-r border-[var(--border)] bg-[var(--surface-1)] backdrop-blur-lg z-30">
+    <aside className="hidden md:flex fixed inset-y-0 left-0 w-64 flex-col border-r border-border bg-surface-1/95 backdrop-blur z-30">
       <NavLink to="/" end className="block px-6 pt-8 pb-6 hover:opacity-90 transition-opacity">
         <h1 className="text-2xl font-extrabold gradient-text">{t('app.name')}</h1>
-        <p className="text-xs text-text-3 mt-1">{t('app.tagline')}</p>
+        <p className="text-xs text-text-3 mt-1 leading-relaxed">{t('app.tagline')}</p>
       </NavLink>
       <nav className="flex-1 px-3 space-y-1">
         {NAV.map(({ to, key, icon: Icon }) => (
@@ -29,7 +31,7 @@ export default function Sidebar() {
             end={to === '/'}
             className={({ isActive }) =>
               cn(
-                'group flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm transition-colors',
+                'group flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm transition-colors',
                 isActive
                   ? 'bg-brand-soft text-brand-light font-semibold'
                   : 'text-text-2 hover:bg-bg-soft hover:text-text-1'
@@ -46,12 +48,29 @@ export default function Sidebar() {
           </NavLink>
         ))}
       </nav>
-      <div className="p-3 border-t border-[var(--border)]">
+      <div className="p-3 border-t border-[var(--border)] space-y-2">
+        {user ? (
+          <button
+            onClick={logout}
+            className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm text-text-2 hover:bg-bg-soft hover:text-text-1 transition-colors"
+          >
+            <LogOut className="w-5 h-5" />
+            <span>로그아웃</span>
+          </button>
+        ) : (
+          <NavLink
+            to="/login"
+            className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm bg-brand text-white font-bold hover:bg-brand-dark transition-colors"
+          >
+            <LogIn className="w-5 h-5" />
+            <span>로그인 / 회원가입</span>
+          </NavLink>
+        )}
         <NavLink
           to="/settings"
           className={({ isActive }) =>
             cn(
-              'w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm transition-colors',
+              'w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm transition-colors',
               isActive
                 ? 'bg-brand-soft text-brand-light font-semibold'
                 : 'text-text-2 hover:bg-bg-soft hover:text-text-1'

@@ -20,7 +20,6 @@ const STATIC_MAP = {
   APT: 'APTUSDT',
   ARB: 'ARBUSDT',
   OP: 'OPUSDT',
-  INJ: 'INJUSDT',
   SUI: 'SUIUSDT',
   SEI: 'SEIUSDT',
   PEPE: 'PEPEUSDT',
@@ -28,12 +27,14 @@ const STATIC_MAP = {
 
 export function toBinanceSymbol(symbol) {
   if (!symbol) return null;
-  const s = symbol.toUpperCase();
-  return STATIC_MAP[s] || `${s}USDT`;
+  let value = symbol.toUpperCase();
+  if (value.includes('-')) value = value.split('-').at(-1);
+  if (value.includes('/')) value = value.split('/')[0];
+  return STATIC_MAP[value] || `${value}USDT`;
 }
 
-export function fromBinanceSymbol(bSymbol) {
-  return bSymbol?.replace(/USDT$/i, '').toUpperCase();
+export function fromBinanceSymbol(binanceSymbol) {
+  return binanceSymbol?.replace(/USDT$/i, '').toUpperCase();
 }
 
 export const BINANCE_INTERVAL = {

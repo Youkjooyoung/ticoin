@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Sparkles, RefreshCw } from 'lucide-react';
+import { RefreshCw, Sparkles } from 'lucide-react';
 import api from '../api/axios.js';
 
 export default function AiAnalysisCard({ symbol, price, changePct }) {
@@ -15,8 +15,8 @@ export default function AiAnalysisCard({ symbol, price, changePct }) {
       });
       setData(res.data);
       setEnabled(res.data?.enabled !== false);
-    } catch (err) {
-      setData({ summary: 'AI 분석을 불러오지 못했습니다.', enabled: true });
+    } catch {
+      setData({ summary: 'AI 분석을 불러오지 못했습니다. 잠시 후 다시 시도해 주세요.', enabled: true, provider: 'OpenAI' });
     } finally {
       setLoading(false);
     }
@@ -35,15 +35,15 @@ export default function AiAnalysisCard({ symbol, price, changePct }) {
           </div>
           <div>
             <h4 className="text-sm font-bold">AI 시장 분석</h4>
-            <p className="text-[10px] text-text-3">Powered by Claude Haiku</p>
+            <p className="text-[10px] text-text-3">Powered by OpenAI Responses API</p>
           </div>
         </div>
         {enabled && (
           <button
             onClick={fetchAnalysis}
             disabled={loading}
-            className="p-2 rounded-lg hover:bg-[var(--surface-2)] transition-colors disabled:opacity-50"
-            aria-label="재분석"
+            className="p-2 rounded-lg hover:bg-surface-2 transition-colors disabled:opacity-50"
+            aria-label="새로고침"
           >
             <RefreshCw className={`w-4 h-4 text-text-2 ${loading ? 'animate-spin' : ''}`} />
           </button>
@@ -53,9 +53,9 @@ export default function AiAnalysisCard({ symbol, price, changePct }) {
       <div className="text-sm leading-relaxed">
         {loading ? (
           <div className="space-y-2">
-            <div className="h-3 rounded bg-[var(--surface-2)] animate-pulse" />
-            <div className="h-3 rounded bg-[var(--surface-2)] animate-pulse w-5/6" />
-            <div className="h-3 rounded bg-[var(--surface-2)] animate-pulse w-4/6" />
+            <div className="h-3 rounded bg-surface-2 animate-pulse" />
+            <div className="h-3 rounded bg-surface-2 animate-pulse w-5/6" />
+            <div className="h-3 rounded bg-surface-2 animate-pulse w-4/6" />
           </div>
         ) : (
           <p className="whitespace-pre-wrap text-text-1">{data?.summary}</p>
@@ -63,8 +63,8 @@ export default function AiAnalysisCard({ symbol, price, changePct }) {
       </div>
 
       {!enabled && (
-        <p className="text-[11px] text-text-3 pt-2 border-t border-[var(--border)]">
-          💡 활성화하려면 백엔드 환경 변수 <code className="mono bg-[var(--surface-2)] px-1.5 py-0.5 rounded">ANTHROPIC_API_KEY</code>를 설정하세요.
+        <p className="text-[11px] text-text-3 pt-2 border-t border-border">
+          활성화하려면 백엔드 환경 변수 <code className="mono bg-surface-2 px-1.5 py-0.5 rounded">OPENAI_API_KEY</code>를 설정하세요.
         </p>
       )}
     </div>

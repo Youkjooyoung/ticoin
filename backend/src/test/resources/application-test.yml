@@ -30,3 +30,7 @@ ticoin:
     coinmarketcap:
       base-url: http://localhost:1
       api-key: ""
+    openai:
+      base-url: http://localhost:1
+      api-key: ""
+      model: gpt-5-mini

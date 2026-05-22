@@ -1,8 +1,8 @@
 {
   "app": {
     "name": "ticoin",
-    "tagline": "すべての資産をひとつに",
-    "version": "ticoin v0.6.0 · すべての資産をひとつに"
+    "tagline": "Binanceリアルタイム暗号資産とYahoo株式ダッシュボード",
+    "version": "ticoin v0.6.0 · Binance live market"
   },
   "nav": {
     "home": "ホーム",
@@ -22,7 +22,7 @@
     "edit": "編集",
     "add": "追加",
     "close": "閉じる",
-    "loading": "読み込み中…",
+    "loading": "読み込み中...",
     "error": "エラー",
     "success": "成功",
     "remove": "削除",
@@ -30,7 +30,7 @@
   },
   "settings": {
     "title": "設定",
-    "subtitle": "お好みに合わせてアプリを調整",
+    "subtitle": "テーマ、言語、通知、アカウント設定を管理します。",
     "section": {
       "theme": "テーマ",
       "language": "言語",
@@ -41,21 +41,21 @@
       "light": "ライト",
       "dark": "ダーク",
       "system": "システム",
-      "switched": "{{mode}}モードに切り替えました"
+      "switched": "{{mode}}モードに切り替えました。"
     },
     "language": {
       "label": "言語",
-      "changed": "言語を{{label}}に変更しました"
+      "changed": "言語を{{label}}に変更しました。"
     },
     "menu": {
       "priceAlerts": "価格アラート",
       "priceAlertsDesc": "有効",
       "privacy": "プライバシーとセキュリティ",
       "privacyDesc": "公開プロフィール",
-      "helpCenter": "ヘルプとサポート",
+      "helpCenter": "ヘルプ",
       "appVersion": "アプリバージョン",
       "logout": "ログアウト",
-      "logoutConfirm": "本当にログアウトしますか？この端末のデータは保持されます。"
+      "logoutConfirm": "ログアウトしますか？ローカルデータはこの端末に残ります。"
     }
   },
   "profile": {
@@ -63,24 +63,24 @@
     "following": "フォロー中",
     "posts": "投稿",
     "totalReturn": "総リターン",
-    "rank": "ランキング",
-    "likes": "獲得いいね",
+    "rank": "ランク",
+    "likes": "受け取ったいいね",
     "comments": "コメント",
-    "trackedAssets": "追跡中の資産",
-    "cryptoNews": "最新クリプトニュース",
+    "trackedAssets": "追跡資産",
+    "cryptoNews": "最新暗号資産ニュース",
     "newsSource": "Google News · CryptoCompare",
-    "newsError": "ニュースを読み込めません。バックエンドまたは外部APIを確認してください。",
-    "defaultBio": "株式 & 暗号資産投資家",
+    "newsError": "ニュースを読み込めませんでした。",
+    "defaultBio": "株式と暗号資産の投資家",
     "defaultNickname": "guest",
     "edit": "プロフィール編集",
     "nickname": "ニックネーム",
     "bio": "自己紹介",
     "removeImage": "画像を削除",
-    "imageSizeError": "画像は5MB以下にしてください",
+    "imageSizeError": "画像は5MB以下にしてください。",
     "imageProcessError": "画像処理に失敗しました: {{error}}",
-    "nicknameRequired": "ニックネームを入力してください",
-    "saveSuccess": "プロフィールを保存しました",
-    "saveFailed": "保存失敗: {{error}}",
+    "nicknameRequired": "ニックネームを入力してください。",
+    "saveSuccess": "プロフィールを保存しました。",
+    "saveFailed": "保存に失敗しました: {{error}}",
     "settingsQuick": "テーマ · 通知 · アカウント"
   },
   "header": {
@@ -88,23 +88,23 @@
     "notifications": "通知"
   },
   "home": {
-    "feedTitle": "フィード"
+    "feedTitle": "ライブフィード"
   },
   "portfolio": {
     "title": "ポートフォリオ",
     "totalValue": "総資産価値",
     "dailyReturn": "日次リターン",
-    "returnHistory": "7日間リターン推移",
+    "returnHistory": "7日リターン推移",
     "allocation": "資産配分",
     "holdings": "保有資産",
-    "noHoldings": "保有資産がありません",
-    "symbol": "シンボル選択",
+    "noHoldings": "保有資産はまだありません。",
+    "symbol": "銘柄を選択",
     "quantity": "数量",
-    "avgPrice": "平均単価",
-    "fieldsRequired": "すべての項目を入力してください",
-    "addSuccess": "{{symbol}}を追加しました",
-    "addFailed": "追加失敗: {{error}}",
-    "deleteSuccess": "{{symbol}}を削除しました",
-    "deleteFailed": "削除失敗: {{error}}"
+    "avgPrice": "平均価格",
+    "fieldsRequired": "すべての項目を入力してください。",
+    "addSuccess": "{{symbol}}を追加しました。",
+    "addFailed": "追加に失敗しました: {{error}}",
+    "deleteSuccess": "{{symbol}}を削除しました。",
+    "deleteFailed": "削除に失敗しました: {{error}}"
   }
 }

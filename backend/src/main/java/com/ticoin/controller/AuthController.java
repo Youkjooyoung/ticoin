@@ -1,8 +1,12 @@
 package com.ticoin.controller;
 
+import com.ticoin.dto.LoginRequest;
+import com.ticoin.dto.RegisterRequest;
 import com.ticoin.entity.User;
 import com.ticoin.repository.UserRepository;
 import com.ticoin.security.JwtService;
+import com.ticoin.service.UserService;
+import jakarta.validation.Valid;
 import io.jsonwebtoken.Claims;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
@@ -20,6 +24,7 @@ public class AuthController {
 
     private final JwtService jwtService;
     private final UserRepository userRepository;
+    private final UserService userService;
 
     @Value("${spring.security.oauth2.client.registration.google.client-id:disabled}")
     private String googleClientId;
@@ -31,6 +36,9 @@ public class AuthController {
     public Map<String, Object> providers() {
         return Map.of(
                 "providers", List.of(
+                        Map.of("id", "local", "label", "Email",
+                               "enabled", true,
+                               "loginUrl", "/login"),
                         Map.of("id", "google", "label", "Google",
                                "enabled", isEnabled(googleClientId),
                                "loginUrl", "/oauth2/authorization/google"),
@@ -40,6 +48,18 @@ public class AuthController {
                 ),
                 "guestMode", true
         );
+    }
+
+    @PostMapping("/register")
+    public Map<String, Object> register(@Valid @RequestBody RegisterRequest request) {
+        User user = userService.registerLocal(request.email(), request.password(), request.name());
+        return authPayload(user);
+    }
+
+    @PostMapping("/login")
+    public Map<String, Object> login(@Valid @RequestBody LoginRequest request) {
+        User user = userService.loginLocal(request.email(), request.password());
+        return authPayload(user);
     }
 
     private boolean isEnabled(String clientId) {
@@ -75,5 +95,19 @@ public class AuthController {
     @GetMapping("/failure")
     public Map<String, Object> failure() {
         return Map.of("error", "oauth2_failed");
+    }
+
+    private Map<String, Object> authPayload(User user) {
+        return Map.of(
+                "token", jwtService.issue(user.getId(), user.getEmail(), user.getRole()),
+                "user", Map.of(
+                        "id", user.getId(),
+                        "email", user.getEmail() != null ? user.getEmail() : "",
+                        "name", user.getName() != null ? user.getName() : "",
+                        "avatarUrl", user.getAvatarUrl() != null ? user.getAvatarUrl() : "",
+                        "provider", user.getProvider(),
+                        "role", user.getRole()
+                )
+        );
     }
 }
